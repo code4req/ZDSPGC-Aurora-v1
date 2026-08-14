@@ -16,10 +16,10 @@ const Hero = () => {
 
   // School videos - Replace these with your actual MP4 files
   const schoolVideos = [
-    '/videos/video1.mp4',
-    '/videos/video2.mp4',
-    '/videos/video3.mp4',
-    '/videos/video4.mp4',
+    '/videos/vid1.mp4',
+    '/videos/vid2.mp4',
+    '/videos/vid3.mp4',
+    '/videos/vid4.mp4',
   ];
 
   const getVideoSrc = (index) => {
