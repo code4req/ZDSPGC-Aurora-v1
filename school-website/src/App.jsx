@@ -56,10 +56,10 @@ function App() {
             </div>
 
             {/* Main Title with Sekuya Font */}
-            <h1 className="font-sekuya text-4xl md:text-6xl font-bold text-white mb-2 tracking-wider">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-2 tracking-wider">
               ZDSPGC
             </h1>
-            <h2 className="font-sekuya text-2xl md:text-4xl text-emerald-300 mb-6 tracking-wider">
+            <h2 className="text-2xl md:text-4xl text-emerald-300 mb-6 tracking-wider">
               - AURORA
             </h2>
 
