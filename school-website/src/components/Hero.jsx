@@ -10,7 +10,7 @@ const Hero = () => {
   const [hasClicked, setHasClicked] = useState(false);
   const [loadedVideos, setLoadedVideos] = useState(0);
 
-  const totalVideos = 5;
+  const totalVideos = 4; // Total number of videos available
   const nextVdRef = useRef(null);
   const videoFrameRef = useRef(null);
 
