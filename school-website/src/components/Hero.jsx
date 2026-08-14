@@ -172,7 +172,7 @@ const Hero = () => {
         {/* Progress Dots */}
         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-40 flex gap-2">
           {[...Array(totalVideos)].map((_, index) => {
-            const videoNames = ['Tour', 'Class', 'Sports', 'Grad', 'Life'];
+            const videoNames = ['Tour', 'Class', 'Sports', 'Grad'];
             return (
               <div
                 key={index}
