@@ -55,7 +55,7 @@ function App() {
               </div>
             </div>
 
-            {/* Main Title with Sekuya Font */}
+            {/* Main Title - Removed font-sekuya */}
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-2 tracking-wider">
               ZDSPGC
             </h1>
@@ -75,7 +75,7 @@ function App() {
             </div>
 
             {/* Loading Text */}
-            <p className="mt-3 text-emerald-300/80 text-sm font-medium font-general-sans">
+            <p className="mt-3 text-emerald-300/80 text-sm font-medium">
               Loading... Please wait
             </p>
 
@@ -87,7 +87,7 @@ function App() {
             </div>
 
             {/* Subtitle */}
-            <p className="mt-6 text-white/40 text-xs uppercase tracking-[0.3em] font-general-sans">
+            <p className="mt-6 text-white/40 text-xs uppercase tracking-[0.3em]">
               Zamboanga del Sur Provincial Government College
             </p>
           </div>
