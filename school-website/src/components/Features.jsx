@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { TiLocationArrow } from "react-icons/ti";
+import { gsap } from 'gsap';
 
 export const BentoTilt = ({ children, className = "" }) => {
   const [transformStyle, setTransformStyle] = useState("");
@@ -38,10 +39,59 @@ export const BentoTilt = ({ children, className = "" }) => {
   );
 };
 
-export const BentoCard = ({ src, title, description, isComingSoon }) => {
+export const BentoCard = ({ src, title, description, isComingSoon, highlightIndex }) => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [hoverOpacity, setHoverOpacity] = useState(0);
   const hoverButtonRef = useRef(null);
+  const titleRef = useRef(null);
+
+  // Animate the title on mount
+  useEffect(() => {
+    const titleWords = titleRef.current?.querySelectorAll('.program-word');
+    
+    if (titleWords) {
+      gsap.fromTo(
+        titleWords,
+        { y: 80, opacity: 0, rotateX: -30 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 1,
+          stagger: 0.1,
+          ease: 'power3.out',
+          delay: 0.2,
+        }
+      );
+    }
+  }, [title]);
+
+  // Function to render title with animated letters
+  const renderAnimatedTitle = (text) => {
+    const letters = text.split('');
+    return letters.map((letter, index) => {
+      // Check if this letter should be highlighted
+      const isHighlighted = highlightIndex && 
+        index >= highlightIndex[0] && 
+        index <= highlightIndex[1];
+      
+      if (isHighlighted) {
+        return (
+          <b 
+            key={index} 
+            className="program-word inline-block font-black text-emerald-400 opacity-0"
+          >
+            {letter}
+          </b>
+        );
+      }
+      return (
+        <span key={index} className="program-word inline-block opacity-0">
+          {letter}
+        </span>
+      );
+    });
+  };
 
   const handleMouseMove = (event) => {
     if (!hoverButtonRef.current) return;
@@ -67,7 +117,12 @@ export const BentoCard = ({ src, title, description, isComingSoon }) => {
       />
       <div className="relative z-10 flex size-full flex-col justify-between p-5 text-blue-50">
         <div>
-          <h1 className="bento-title special-font">{title}</h1>
+          <h1 
+            ref={titleRef}
+            className="bento-title special-font text-4xl md:text-6xl font-black uppercase"
+          >
+            {renderAnimatedTitle(title)}
+          </h1>
           {description && (
             <p className="mt-3 max-w-64 text-xs md:text-base">{description}</p>
           )}
@@ -79,19 +134,98 @@ export const BentoCard = ({ src, title, description, isComingSoon }) => {
             onMouseMove={handleMouseMove}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className="border-hsla relative flex w-fit cursor-pointer items-center gap-1 overflow-hidden rounded-full bg-black px-5 py-2 text-xs uppercase text-white/20"
+            className="border-hsla relative flex w-fit cursor-pointer items-center gap-1 overflow-hidden rounded-full bg-emerald-500 px-5 py-2 text-xs uppercase text-white font-medium shadow-lg shadow-emerald-500/30 hover:bg-emerald-400 transition-all duration-300 hover:shadow-emerald-400/50 hover:scale-105"
           >
             <div
               className="pointer-events-none absolute -inset-px opacity-0 transition duration-300"
               style={{
                 opacity: hoverOpacity,
-                background: `radial-gradient(100px circle at ${cursorPosition.x}px ${cursorPosition.y}px, #656fe288, #00000026)`,
+                background: `radial-gradient(100px circle at ${cursorPosition.x}px ${cursorPosition.y}px, #ffffff44, #00000026)`,
               }}
             />
             <TiLocationArrow className="relative z-20" />
-            <p className="relative z-20">coming soon</p>
+            <p className="relative z-20">view program</p>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+// Helper component for cards without the hover effect
+const ProgramCard = ({ src, title, description, highlightIndex }) => {
+  const titleRef = useRef(null);
+
+  useEffect(() => {
+    const titleWords = titleRef.current?.querySelectorAll('.program-word');
+    
+    if (titleWords) {
+      gsap.fromTo(
+        titleWords,
+        { y: 80, opacity: 0, rotateX: -30 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 1,
+          stagger: 0.1,
+          ease: 'power3.out',
+          delay: 0.2,
+        }
+      );
+    }
+  }, [title]);
+
+  const renderAnimatedTitle = (text) => {
+    const letters = text.split('');
+    return letters.map((letter, index) => {
+      const isHighlighted = highlightIndex && 
+        index >= highlightIndex[0] && 
+        index <= highlightIndex[1];
+      
+      if (isHighlighted) {
+        return (
+          <b 
+            key={index} 
+            className="program-word inline-block font-black text-emerald-400 opacity-0"
+          >
+            {letter}
+          </b>
+        );
+      }
+      return (
+        <span key={index} className="program-word inline-block opacity-0">
+          {letter}
+        </span>
+      );
+    });
+  };
+
+  return (
+    <div className="relative size-full overflow-hidden">
+      <video
+        src={src}
+        loop
+        muted
+        autoPlay
+        className="absolute left-0 top-0 size-full object-cover object-center"
+      />
+      <div className="relative z-10 flex size-full flex-col justify-between p-5 text-blue-50">
+        <div>
+          <h1 
+            ref={titleRef}
+            className="bento-title special-font text-4xl md:text-6xl font-black uppercase"
+          >
+            {renderAnimatedTitle(title)}
+          </h1>
+          <p className="mt-3 max-w-64 text-xs md:text-base">
+            {description}
+          </p>
+        </div>
+        <div className="border-hsla relative flex w-fit cursor-pointer items-center gap-1 overflow-hidden rounded-full bg-emerald-500 px-5 py-2 text-xs uppercase text-white font-medium shadow-lg shadow-emerald-500/30 hover:bg-emerald-400 transition-all duration-300 hover:shadow-emerald-400/50 hover:scale-105">
+          <TiLocationArrow className="relative z-20" />
+          <p className="relative z-20">view program</p>
+        </div>
       </div>
     </div>
   );
@@ -111,76 +245,62 @@ const Features = () => (
 
       <BentoTilt className="border-hsla relative mb-7 h-96 w-full overflow-hidden rounded-md md:h-[65vh]">
         <BentoCard
-          src="/videos/vid3.mp4"
-          title={
-            <>
-              BSIS <b>P</b>rogram
-            </>
-          }
-          description="Science, Technology, Engineering, and Mathematics with hands-on learning."
+          src="/videos/BSIS.mp4"
+          title="BSIS"
+          description="Technology, business, and systems working together."
           isComingSoon
+          highlightIndex={[2, 2]} // Highlight the 'I' in BSIS
         />
       </BentoTilt>
 
       <div className="grid h-[135vh] w-full grid-cols-2 grid-rows-3 gap-7">
         <BentoTilt className="bento-tilt_1 row-span-1 md:col-span-1 md:row-span-2">
           <BentoCard
-            src="/videos/vid4.mp4"
-            title={
-              <>
-                BS<b>B</b>IOLOGY
-              </>
-            }
-            description="Visual arts, music, drama, and creative expression."
+            src="/videos/BSBIO.mp4"
+            title="BSBIO"
+            description="Exploring life, science, and the living world."
             isComingSoon
+            highlightIndex={[3, 5]} // Highlight 'BIO'
           />
         </BentoTilt>
 
         <BentoTilt className="bento-tilt_1 row-span-1 ms-32 md:col-span-1 md:ms-0">
           <BentoCard
-            src="/videos/vid2.mp4"
-            title={
-              <>
-                BP<b>E</b>D
-              </>
-            }
-            description="Comprehensive athletic programs for physical excellence."
+            src="/videos/BPED.mp4"
+            title="BPED"
+            description="Shaping active, healthy, and skilled individuals through physical education."
             isComingSoon
+            highlightIndex={[2, 2]} // Highlight the 'E' in BPED
           />
         </BentoTilt>
 
         <BentoTilt className="bento-tilt_1 me-14 md:col-span-1 md:me-0">
           <BentoCard
-            src="/videos/vid1.mp4"
-            title={
-              <>
-                BS<b>C</b>RIM
-              </>
-            }
-            description="Global communication through diverse language programs."
+            src="/videos/BSCRIM.mp4"
+            title="BSCRIM"
+            description="Justice, safety, and service for a better community."
             isComingSoon
+            highlightIndex={[2, 2]} // Highlight the 'C' in BSCRIM
           />
         </BentoTilt>
 
+        {/* More Programs - BTVTED Video */}
         <BentoTilt className="bento-tilt_2">
-          <div className="flex size-full flex-col justify-between bg-violet-300 p-5">
-            <h1 className="bento-title special-font max-w-64 text-black">
-              M<b>o</b>re Progra<b>m</b>s
-              <br />
-              C<b>o</b>ming S<b>o</b>on.
-            </h1>
-
-            <TiLocationArrow className="m-5 scale-[5] self-end" />
-          </div>
+          <ProgramCard
+            src="/videos/BTVTED.mp4"
+            title="BTVTED"
+            description="Technical-Vocational Teacher Education for future educators."
+            highlightIndex={[4, 5]} // Highlight 'ED'
+          />
         </BentoTilt>
 
+        {/* BSA Video */}
         <BentoTilt className="bento-tilt_2">
-          <video
-            src="/videos/vid3.mp4"
-            loop
-            muted
-            autoPlay
-            className="size-full object-cover object-center"
+          <ProgramCard
+            src="/videos/BSA.mp4"
+            title="BSA"
+            description="Agricultural Sciences for sustainable farming and development."
+            highlightIndex={[2, 2]} // Highlight the 'A' in BSA
           />
         </BentoTilt>
       </div>

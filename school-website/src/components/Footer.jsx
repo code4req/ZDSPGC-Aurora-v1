@@ -1,53 +1,43 @@
-function Footer() {
+import { FaDiscord, FaTwitter, FaYoutube, FaMedium, FaFacebook, FaInstagram } from "react-icons/fa";
+
+const socialLinks = [
+  { href: "https://facebook.com", icon: <FaFacebook /> },
+  { href: "https://twitter.com", icon: <FaTwitter /> },
+  { href: "https://youtube.com", icon: <FaYoutube /> },
+  { href: "https://instagram.com", icon: <FaInstagram /> },
+];
+
+const Footer = () => {
   return (
-    <footer className="bg-slate-900 text-white py-12 border-t border-white/10">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
-              SchoolName
-            </h3>
-            <p className="text-gray-400">
-              Empowering minds, building futures since 2000.
-            </p>
-          </div>
+    <footer className="w-screen bg-gradient-to-r from-green-700 to-emerald-800 py-4 text-white">
+      <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 md:flex-row">
+        <p className="text-center text-sm font-light md:text-left text-green-100/80">
+          © 2026 ZDSPGC. All rights reserved
+        </p>
 
-          <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#about" className="hover:text-white transition">About</a></li>
-              <li><a href="#programs" className="hover:text-white transition">Programs</a></li>
-              <li><a href="#gallery" className="hover:text-white transition">Gallery</a></li>
-              <li><a href="#contact" className="hover:text-white transition">Contact</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li>📍 123 School Street</li>
-              <li>📞 (123) 456-7890</li>
-              <li>✉️ info@schoolname.com</li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4">Follow Us</h4>
-            <div className="flex space-x-4 text-2xl">
-              <a href="#" className="hover:text-purple-400 transition">📘</a>
-              <a href="#" className="hover:text-purple-400 transition">🐦</a>
-              <a href="#" className="hover:text-purple-400 transition">📷</a>
-              <a href="#" className="hover:text-purple-400 transition">💼</a>
-            </div>
-          </div>
+        <div className="flex justify-center gap-4 md:justify-start">
+          {socialLinks.map((link, index) => (
+            <a
+              key={index}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-100/80 transition-colors duration-300 ease-in-out hover:text-white hover:scale-110 transform"
+            >
+              {link.icon}
+            </a>
+          ))}
         </div>
 
-        <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2026 SchoolName. All rights reserved.</p>
-        </div>
+        <a
+          href="#privacy-policy"
+          className="text-center text-sm font-light hover:text-white transition-colors md:text-right text-green-100/80"
+        >
+          Privacy Policy
+        </a>
       </div>
     </footer>
   );
-}
+};
 
 export default Footer;

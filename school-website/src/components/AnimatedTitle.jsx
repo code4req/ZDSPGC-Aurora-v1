@@ -5,7 +5,12 @@ import clsx from "clsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AnimatedTitle = ({ title, containerClass }) => {
+const AnimatedTitle = ({
+  title,
+  containerClass,
+  align = "center",
+  fontClass = "",
+}) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -23,23 +28,41 @@ const AnimatedTitle = ({ title, containerClass }) => {
         ".animated-word",
         {
           opacity: 1,
-          transform: "translate3d(0, 0, 0) rotateY(0deg) rotateX(0deg)",
+          transform:
+            "translate3d(0, 0, 0) rotateY(0deg) rotateX(0deg)",
           ease: "power2.inOut",
-          stagger: 0.02,
+          stagger: 0.11,
         },
         0
       );
     }, containerRef);
 
-    return () => ctx.revert(); // Clean up on unmount
+    return () => ctx.revert();
   }, []);
 
+  // Alignment
+  const getAlignmentClass = () => {
+    if (align === "left") {
+      return "flex justify-start items-start text-left";
+    }
+
+    return "flex justify-center items-center text-center";
+  };
+
   return (
-    <div ref={containerRef} className={clsx("animated-title", containerClass)}>
+    <div
+      ref={containerRef}
+      className={clsx("animated-title", containerClass)}
+    >
       {title.split("<br />").map((line, index) => (
         <div
           key={index}
-          className="flex-center max-w-full flex-wrap gap-2 px-10 md:gap-3"
+          className={clsx(
+            "max-w-full flex-wrap gap-2 md:gap-3 w-full",
+            align === "left" ? "px-0" : "px-10",
+            getAlignmentClass(),
+            fontClass
+          )}
         >
           {line.split(" ").map((word, idx) => (
             <span

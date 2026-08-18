@@ -67,7 +67,7 @@ const Story = () => {
                   onMouseLeave={handleMouseLeave}
                   onMouseUp={handleMouseLeave}
                   onMouseEnter={handleMouseLeave}
-                  src="/img/ling.webp"
+                  src="/img/zdspgcv.jpg"
                   alt="School Story"
                   className="object-contain"
                 />
@@ -112,8 +112,22 @@ const Story = () => {
             <Button
               id="story-btn"
               title="Read Our Story"
-              containerClass="mt-5"
-            />
+              containerClass="group relative mt-5 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-full shadow-lg hover:shadow-2xl hover:shadow-green-500/40 hover:scale-105 transition-all duration-300 overflow-hidden border border-green-400/30"
+            >
+              <span className="relative z-10 flex items-center gap-2 text-sm">
+                Read Our Story
+                <svg 
+                  className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+            </Button>
           </div>
         </div>
       </div>

@@ -52,11 +52,17 @@ body {
     font-display: swap;
   }
 
-  /* REMOVED: Sekuya font - file doesn't exist */
+  @font-face {
+    font-family: 'FK Screamer Black';
+    src: url('/fonts/FKScreamerblack.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+  }
 
-  /* Apply General Sans to all elements */
-  * {
-    font-family: "General Sans", "general", sans-serif;
+  /* UTILITY CLASS FOR FK SCREAMER */
+  .font-screamer {
+    font-family: 'FK Screamer Black', sans-serif !important;
   }
 
   /* Hero specific font */
@@ -226,7 +232,6 @@ body {
     clip-path: polygon(29% 15%, 85% 30%, 50% 100%, 10% 64%);
   }
 
-  /* Hero Font Classes */
   .font-hero-title {
     font-family: "General Sans", "general", sans-serif;
     font-weight: 700;
@@ -245,12 +250,6 @@ body {
     letter-spacing: -0.02em;
   }
 
-  /* REMOVED: Sekuya Font for Branding - no longer needed */
-  /* .font-sekuya {
-    font-family: "sekuya", "Sekuya", cursive;
-  } */
-
-  /* General Sans for body */
   .font-general-sans {
     font-family: "General Sans", "general", sans-serif;
   }
@@ -280,8 +279,6 @@ body {
   }
 }
 
-/* From Uiverse.io by G4b413l */
-/* https://uiverse.io/G4b413l/tidy-walrus-92 */
 .three-body {
   --uib-size: 35px;
   --uib-speed: 0.8s;
@@ -383,4 +380,27 @@ body {
     transform: translateY(66%) scale(0.65);
     opacity: 0.8;
   }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #059669;
 }
