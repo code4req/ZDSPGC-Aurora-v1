@@ -284,7 +284,7 @@ const About = () => {
             style={{ willChange: 'transform' }}
           >
             <source src="/videos/campus-experience.webm" type="video/webm" />
-            <source src="/videos/BSBIO.mp4" type="video/mp4" />
+            <source src="/videos/bsbio.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           

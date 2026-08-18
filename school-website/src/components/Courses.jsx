@@ -93,7 +93,7 @@ const Courses = () => {
         "Database Administrator",
         "Network Engineer"
       ],
-      video: "/videos/BSIS.mp4"
+      video: "/videos/bsis.mp4"
     },
     {
       id: "bsbio",
@@ -120,7 +120,7 @@ const Courses = () => {
         "Biotechnologist",
         "Medical Researcher"
       ],
-      video: "/videos/BSBIO.mp4"
+      video: "/videos/bsbio.mp4"
     },
     {
       id: "btvted",
@@ -147,7 +147,7 @@ const Courses = () => {
         "Educational Consultant",
         "Skills Assessor"
       ],
-      video: "/videos/BTVTED.mp4"
+      video: "/videos/btvted.mp4"
     },
     {
       id: "bped",
@@ -174,7 +174,7 @@ const Courses = () => {
         "Recreation Director",
         "Health Educator"
       ],
-      video: "/videos/BPED.mp4"
+      video: "/videos/bped.mp4"
     },
     {
       id: "bsa",
@@ -201,7 +201,7 @@ const Courses = () => {
         "Research Scientist",
         "Extension Officer"
       ],
-      video: "/videos/BSA.mp4"
+      video: "/videos/bsa.mp4"
     },
     {
       id: "bscrim",
@@ -228,7 +228,7 @@ const Courses = () => {
         "Security Consultant",
         "Public Safety Officer"
       ],
-      video: "/videos/BSCRIM.mp4"
+      video: "/videos/bscrim.mp4"
     }
   ];
 
@@ -374,7 +374,7 @@ const Courses = () => {
           }}
         >
           <video
-            src="/videos/BSIS.mp4"
+            src="/videos/bsis.mp4"
             autoPlay
             muted
             loop
