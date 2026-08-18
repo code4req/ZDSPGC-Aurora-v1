@@ -245,7 +245,7 @@ const Features = () => (
 
       <BentoTilt className="border-hsla relative mb-7 h-96 w-full overflow-hidden rounded-md md:h-[65vh]">
         <BentoCard
-          src="/videos/BSIS.mp4"
+          src="/videos/bsis.mp4"
           title="BSIS"
           description="Technology, business, and systems working together."
           isComingSoon
@@ -256,7 +256,7 @@ const Features = () => (
       <div className="grid h-[135vh] w-full grid-cols-2 grid-rows-3 gap-7">
         <BentoTilt className="bento-tilt_1 row-span-1 md:col-span-1 md:row-span-2">
           <BentoCard
-            src="/videos/BSBIO.mp4"
+            src="/videos/bsbio.mp4"
             title="BSBIO"
             description="Exploring life, science, and the living world."
             isComingSoon
@@ -266,7 +266,7 @@ const Features = () => (
 
         <BentoTilt className="bento-tilt_1 row-span-1 ms-32 md:col-span-1 md:ms-0">
           <BentoCard
-            src="/videos/BPED.mp4"
+            src="/videos/bped.mp4"
             title="BPED"
             description="Shaping active, healthy, and skilled individuals through physical education."
             isComingSoon
@@ -276,7 +276,7 @@ const Features = () => (
 
         <BentoTilt className="bento-tilt_1 me-14 md:col-span-1 md:me-0">
           <BentoCard
-            src="/videos/BSCRIM.mp4"
+            src="/videos/bscrim.mp4"
             title="BSCRIM"
             description="Justice, safety, and service for a better community."
             isComingSoon
@@ -287,7 +287,7 @@ const Features = () => (
         {/* More Programs - BTVTED Video */}
         <BentoTilt className="bento-tilt_2">
           <ProgramCard
-            src="/videos/BTVTED.mp4"
+            src="/videos/btvted.mp4"
             title="BTVTED"
             description="Technical-Vocational Teacher Education for future educators."
             highlightIndex={[4, 5]} // Highlight 'ED'
@@ -297,7 +297,7 @@ const Features = () => (
         {/* BSA Video */}
         <BentoTilt className="bento-tilt_2">
           <ProgramCard
-            src="/videos/BSA.mp4"
+            src="/videos/bsa.mp4"
             title="BSA"
             description="Agricultural Sciences for sustainable farming and development."
             highlightIndex={[2, 2]} // Highlight the 'A' in BSA

@@ -15,10 +15,10 @@ const Hero = () => {
   const zdspgcRef = useRef(null);
 
   const schoolVideos = [
-    '/videos/BSA.mp4',
-    '/videos/BSBIO.mp4',
-    '/videos/BSCRIM.mp4',
-    '/videos/BPED.mp4',
+    '/videos/bsa.mp4',
+    '/videos/bsbio.mp4',
+    '/videos/bscrim.mp4',
+    '/videos/bped.mp4',
   ];
 
   const getVideoSrc = (index) => {

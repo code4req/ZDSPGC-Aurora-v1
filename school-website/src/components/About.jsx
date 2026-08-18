@@ -121,7 +121,7 @@ const About = () => {
     },
     { 
       label: "Student Life", 
-      mp4: "/videos/studentlife.mp4", 
+      mp4: "/videos/student.mp4", 
       webm: "/videos/student-life.webm",
       poster: "/img/students.jpg"
     },
@@ -133,7 +133,7 @@ const About = () => {
     },
     { 
       label: "Campus Events", 
-      mp4: "/videos/campevent.mp4", 
+      mp4: "/videos/campevents.mp4", 
       webm: "/videos/events.webm",
       poster: "/img/events.jpg"
     }
