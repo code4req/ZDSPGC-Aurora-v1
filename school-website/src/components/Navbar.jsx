@@ -247,9 +247,7 @@ const NavBar = ({
             >
               <FaLock className="text-xs" />
 
-              <span>
-                Admin Login
-              </span>
+    
 
             </button>
 
@@ -357,10 +355,6 @@ const NavBar = ({
                 className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 text-white text-sm font-semibold uppercase tracking-wider transition-all duration-300 hover:bg-emerald-500 hover:text-black hover:border-emerald-400 mt-1"
               >
                 <FaLock />
-
-                <span>
-                  Admin Login
-                </span>
 
               </button>
 
