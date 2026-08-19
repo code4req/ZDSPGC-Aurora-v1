@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/all";
 
@@ -15,14 +15,72 @@ import Events from "./components/Events";
 import Footer from "./components/Footer";
 import LoadingScreen from "./components/LoadingScreen";
 
+import AdminLogin from "./components/AdminLogin";
+import AdminDashboard from "./components/AdminDashboard";
+
+import { supabase } from "./lib/supabase";
+
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
 function App() {
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState('home');
+
+  const [currentPage, setCurrentPage] = useState("home");
+
   const [loadingMessage, setLoadingMessage] = useState("");
+
+  // ============================================================
+  // ADMIN
+  // ============================================================
+
+  const [adminUser, setAdminUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Controls the ADMIN LOGIN MODAL
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+
+  /*
+  ============================================================
+  CHECK SUPABASE AUTH SESSION
+  ============================================================
+  */
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        setAdminUser(session.user);
+      }
+
+      setCheckingAuth(false);
+    };
+
+    checkSession();
+
+    // Listen for login/logout changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setAdminUser(session?.user ?? null);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  /*
+  ============================================================
+  PUBLIC PAGE LOADING
+  ============================================================
+  */
 
   const handleLoadingComplete = () => {
     setLoading(false);
@@ -36,7 +94,7 @@ function App() {
   const navigateTo = (page, message) => {
     setPageLoading(true);
     setLoadingMessage(message);
-    
+
     setTimeout(() => {
       setCurrentPage(page);
       handlePageLoadingComplete();
@@ -44,93 +102,236 @@ function App() {
   };
 
   const navigateToContact = () => {
-    navigateTo('contact', "Loading Contact");
+    navigateTo("contact", "Loading Contact");
   };
 
   const navigateToHome = () => {
-    navigateTo('home', "Loading Home");
+    navigateTo("home", "Loading Home");
   };
 
   const navigateToAbout = () => {
-    navigateTo('about', "Loading About");
+    navigateTo("about", "Loading About");
   };
 
   const navigateToCourses = () => {
-    navigateTo('courses', "Loading Courses");
+    navigateTo("courses", "Loading Courses");
   };
 
   const navigateToEvents = () => {
-    navigateTo('events', "Loading Events");
+    navigateTo("events", "Loading Events");
   };
+
+  /*
+  ============================================================
+  ADMIN LOGIN
+  ============================================================
+  */
+
+  // Called after successful Supabase login
+  const handleAdminLogin = (user) => {
+    setAdminUser(user);
+
+    // Close the modal after successful login
+    setShowAdminLogin(false);
+  };
+
+  // Open login modal
+  const openAdminLogin = () => {
+    setShowAdminLogin(true);
+  };
+
+  // Close login modal
+  const closeAdminLogin = () => {
+    setShowAdminLogin(false);
+  };
+
+  /*
+  ============================================================
+  ADMIN LOGOUT
+  ============================================================
+  */
+
+  const handleAdminLogout = async () => {
+    await supabase.auth.signOut();
+
+    setAdminUser(null);
+    setCurrentPage("home");
+
+    window.scrollTo(0, 0);
+  };
+
+  /*
+  ============================================================
+  ADMIN ROUTE
+  ============================================================
+  */
+
+  const isAdminPage =
+    window.location.pathname === "/admin";
+
+  /*
+  ============================================================
+  WAIT FOR AUTH CHECK
+  ============================================================
+  */
+
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen w-screen bg-black flex items-center justify-center text-emerald-400">
+        <div className="text-xs font-mono uppercase tracking-[0.3em] animate-pulse">
+          Initializing Administration System...
+        </div>
+      </main>
+    );
+  }
+
+  /*
+  ============================================================
+  ADMIN PAGE
+  ============================================================
+  */
+
+  if (isAdminPage) {
+    return adminUser ? (
+      <AdminDashboard
+        user={adminUser}
+        onLogout={handleAdminLogout}
+      />
+    ) : (
+      <AdminLogin
+        onLogin={handleAdminLogin}
+        onClose={() => {
+          window.history.back();
+        }}
+      />
+    );
+  }
+
+  /*
+  ============================================================
+  PUBLIC WEBSITE
+  ============================================================
+  */
 
   return (
     <main className="relative min-h-screen w-screen overflow-x-hidden bg-white">
+
+      {/* ======================================================
+          INITIAL LOADING
+      ====================================================== */}
+
       {loading && (
-        <LoadingScreen 
+        <LoadingScreen
           message="Welcome to ZDSPGC"
           onComplete={handleLoadingComplete}
         />
       )}
 
+      {/* ======================================================
+          PAGE LOADING
+      ====================================================== */}
+
       {pageLoading && (
-        <LoadingScreen 
+        <LoadingScreen
           message={loadingMessage}
           onComplete={handlePageLoadingComplete}
         />
       )}
 
+      {/* ======================================================
+          PUBLIC WEBSITE
+      ====================================================== */}
+
       {!loading && !pageLoading && (
         <>
-          <NavBar 
+          <NavBar
             onContactClick={navigateToContact}
             onHomeClick={navigateToHome}
             onAboutClick={navigateToAbout}
             onCoursesClick={navigateToCourses}
             onEventsClick={navigateToEvents}
+
+            // ⭐ ADMIN LOGIN MODAL
+            onAdminLoginClick={openAdminLogin}
+
             currentPage={currentPage}
           />
-          
-          {currentPage === 'home' && (
+
+          {/* ==================================================
+              HOME
+          ================================================== */}
+
+          {currentPage === "home" && (
             <>
               <Hero />
+
               <div className="bg-white">
                 <Welcome />
                 <Features />
                 <Story />
               </div>
+
               <Footer />
             </>
           )}
-          
-          {currentPage === 'about' && (
+
+          {/* ==================================================
+              ABOUT
+          ================================================== */}
+
+          {currentPage === "about" && (
             <>
               <About />
               <Footer />
             </>
           )}
-          
-          {currentPage === 'courses' && (
+
+          {/* ==================================================
+              COURSES
+          ================================================== */}
+
+          {currentPage === "courses" && (
             <>
               <Courses />
               <Footer />
             </>
           )}
-          
-          {currentPage === 'events' && (
+
+          {/* ==================================================
+              EVENTS
+          ================================================== */}
+
+          {currentPage === "events" && (
             <>
               <Events />
               <Footer />
             </>
           )}
-          
-          {currentPage === 'contact' && (
+
+          {/* ==================================================
+              CONTACT
+          ================================================== */}
+
+          {currentPage === "contact" && (
             <>
               <Contact />
               <Footer />
             </>
           )}
+
+          {/* ==================================================
+              ADMIN LOGIN MODAL
+          ================================================== */}
+
+          {showAdminLogin && (
+            <AdminLogin
+              onLogin={handleAdminLogin}
+              onClose={closeAdminLogin}
+            />
+          )}
         </>
       )}
+
     </main>
   );
 }
