@@ -1,311 +1,417 @@
 import { useState, useRef, useEffect } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/all';
+import { FaGraduationCap, FaRocket, FaAtom, FaDna, FaRunning, FaGavel, FaSeedling } from 'react-icons/fa';
 
-export const BentoTilt = ({ children, className = "" }) => {
+gsap.registerPlugin(ScrollTrigger);
+
+// Unique 3D tilt effect with glass morphism
+export const GlassTilt = ({ children, className = "" }) => {
   const [transformStyle, setTransformStyle] = useState("");
+  const [glowStyle, setGlowStyle] = useState({});
   const itemRef = useRef(null);
 
   const handleMouseMove = (event) => {
     if (!itemRef.current) return;
 
-    const { left, top, width, height } =
-      itemRef.current.getBoundingClientRect();
+    const { left, top, width, height } = itemRef.current.getBoundingClientRect();
+    const x = (event.clientX - left) / width;
+    const y = (event.clientY - top) / height;
+    
+    const tiltX = (y - 0.5) * 12;
+    const tiltY = (x - 0.5) * -12;
+    
+    const glowX = x * 100;
+    const glowY = y * 100;
 
-    const relativeX = (event.clientX - left) / width;
-    const relativeY = (event.clientY - top) / height;
-
-    const tiltX = (relativeY - 0.5) * 5;
-    const tiltY = (relativeX - 0.5) * -5;
-
-    const newTransform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(.95, .95, .95)`;
-    setTransformStyle(newTransform);
+    setTransformStyle(
+      `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`
+    );
+    
+    setGlowStyle({
+      background: `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
+    });
   };
 
   const handleMouseLeave = () => {
     setTransformStyle("");
+    setGlowStyle({});
   };
 
   return (
     <div
       ref={itemRef}
-      className={className}
+      className={`relative transition-transform duration-200 ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ transform: transformStyle }}
     >
+      <div 
+        className="absolute inset-0 pointer-events-none transition-opacity duration-300 rounded-2xl"
+        style={glowStyle}
+      />
       {children}
     </div>
   );
 };
 
-export const BentoCard = ({ src, title, description, isComingSoon, highlightIndex }) => {
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [hoverOpacity, setHoverOpacity] = useState(0);
-  const hoverButtonRef = useRef(null);
+// Main card component with uniform height
+export const ProgramCard = ({ 
+  src, 
+  title, 
+  description, 
+  icon: Icon, 
+  color = "emerald",
+  index = 0
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef(null);
   const titleRef = useRef(null);
+  const iconRef = useRef(null);
 
-  // Animate the title on mount
+  // Entrance animation with smooth scroll trigger
   useEffect(() => {
-    const titleWords = titleRef.current?.querySelectorAll('.program-word');
-    
-    if (titleWords) {
-      gsap.fromTo(
-        titleWords,
-        { y: 80, opacity: 0, rotateX: -30 },
-        {
-          y: 0,
-          opacity: 1,
-          rotateX: 0,
-          duration: 1,
-          stagger: 0.1,
-          ease: 'power3.out',
-          delay: 0.2,
-        }
-      );
-    }
-  }, [title]);
+    const tl = gsap.timeline({
+      defaults: { ease: "power4.out" },
+      scrollTrigger: {
+        trigger: cardRef.current,
+        start: "top 85%",
+        end: "top 40%",
+        scrub: 1,
+        toggleActions: "play none none reverse",
+      },
+    });
 
-  // Function to render title with animated letters
-  const renderAnimatedTitle = (text) => {
-    const letters = text.split('');
-    return letters.map((letter, index) => {
-      // Check if this letter should be highlighted
-      const isHighlighted = highlightIndex && 
-        index >= highlightIndex[0] && 
-        index <= highlightIndex[1];
-      
-      if (isHighlighted) {
-        return (
-          <b 
-            key={index} 
-            className="program-word inline-block font-black text-emerald-400 opacity-0"
-          >
-            {letter}
-          </b>
-        );
+    tl.fromTo(cardRef.current, 
+      { 
+        y: 80, 
+        opacity: 0,
+        scale: 0.9,
+        rotationZ: -2,
+      },
+      { 
+        y: 0, 
+        opacity: 1,
+        scale: 1,
+        rotationZ: 0,
+        duration: 1,
       }
-      return (
-        <span key={index} className="program-word inline-block opacity-0">
-          {letter}
-        </span>
-      );
+    );
+
+    // Icon float animation
+    gsap.to(iconRef.current, {
+      y: -8,
+      duration: 2.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+      delay: index * 0.2,
     });
+
+    return () => {
+      tl.kill();
+    };
+  }, [index]);
+
+  const colorMap = {
+    emerald: { bg: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20" },
+    blue: { bg: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20" },
+    purple: { bg: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20" },
+    orange: { bg: "from-orange-500/20 to-amber-500/20", border: "border-orange-400/30", glow: "shadow-orange-500/20" },
+    red: { bg: "from-red-500/20 to-rose-500/20", border: "border-red-400/30", glow: "shadow-red-500/20" },
   };
 
-  const handleMouseMove = (event) => {
-    if (!hoverButtonRef.current) return;
-    const rect = hoverButtonRef.current.getBoundingClientRect();
-
-    setCursorPosition({
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    });
-  };
-
-  const handleMouseEnter = () => setHoverOpacity(1);
-  const handleMouseLeave = () => setHoverOpacity(0);
+  const colors = colorMap[color] || colorMap.emerald;
 
   return (
-    <div className="relative size-full">
-      <video
-        src={src}
-        loop
-        muted
-        autoPlay
-        className="absolute left-0 top-0 size-full object-cover object-center"
-      />
-      <div className="relative z-10 flex size-full flex-col justify-between p-5 text-blue-50">
-        <div>
-          <h1 
-            ref={titleRef}
-            className="bento-title special-font text-4xl md:text-6xl font-black uppercase"
+    <div
+      ref={cardRef}
+      className={`relative group overflow-hidden rounded-3xl backdrop-blur-xl bg-gradient-to-br ${colors.bg} border ${colors.border} shadow-2xl ${colors.glow} h-[400px] w-full transition-all duration-500`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Animated background video with overlay */}
+      <div className="absolute inset-0 overflow-hidden">
+        <video
+          src={src}
+          loop
+          muted
+          autoPlay
+          className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 h-full flex flex-col justify-between p-8 text-white">
+        <div className="flex items-start justify-between">
+          {/* Icon with floating animation */}
+          <div 
+            ref={iconRef}
+            className={`p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20`}
           >
-            {renderAnimatedTitle(title)}
-          </h1>
-          {description && (
-            <p className="mt-3 max-w-64 text-xs md:text-base">{description}</p>
-          )}
+            {Icon && <Icon className="text-3xl text-white" />}
+          </div>
+          
+          {/* Program badge */}
+          <span className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium uppercase tracking-wider">
+            Program
+          </span>
         </div>
 
-        {isComingSoon && (
-          <div
-            ref={hoverButtonRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            className="border-hsla relative flex w-fit cursor-pointer items-center gap-1 overflow-hidden rounded-full bg-emerald-500 px-5 py-2 text-xs uppercase text-white font-medium shadow-lg shadow-emerald-500/30 hover:bg-emerald-400 transition-all duration-300 hover:shadow-emerald-400/50 hover:scale-105"
-          >
-            <div
-              className="pointer-events-none absolute -inset-px opacity-0 transition duration-300"
-              style={{
-                opacity: hoverOpacity,
-                background: `radial-gradient(100px circle at ${cursorPosition.x}px ${cursorPosition.y}px, #ffffff44, #00000026)`,
-              }}
-            />
-            <TiLocationArrow className="relative z-20" />
-            <p className="relative z-20">view program</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Helper component for cards without the hover effect
-const ProgramCard = ({ src, title, description, highlightIndex }) => {
-  const titleRef = useRef(null);
-
-  useEffect(() => {
-    const titleWords = titleRef.current?.querySelectorAll('.program-word');
-    
-    if (titleWords) {
-      gsap.fromTo(
-        titleWords,
-        { y: 80, opacity: 0, rotateX: -30 },
-        {
-          y: 0,
-          opacity: 1,
-          rotateX: 0,
-          duration: 1,
-          stagger: 0.1,
-          ease: 'power3.out',
-          delay: 0.2,
-        }
-      );
-    }
-  }, [title]);
-
-  const renderAnimatedTitle = (text) => {
-    const letters = text.split('');
-    return letters.map((letter, index) => {
-      const isHighlighted = highlightIndex && 
-        index >= highlightIndex[0] && 
-        index <= highlightIndex[1];
-      
-      if (isHighlighted) {
-        return (
-          <b 
-            key={index} 
-            className="program-word inline-block font-black text-emerald-400 opacity-0"
-          >
-            {letter}
-          </b>
-        );
-      }
-      return (
-        <span key={index} className="program-word inline-block opacity-0">
-          {letter}
-        </span>
-      );
-    });
-  };
-
-  return (
-    <div className="relative size-full overflow-hidden">
-      <video
-        src={src}
-        loop
-        muted
-        autoPlay
-        className="absolute left-0 top-0 size-full object-cover object-center"
-      />
-      <div className="relative z-10 flex size-full flex-col justify-between p-5 text-blue-50">
         <div>
-          <h1 
+          {/* Title with animated letters */}
+          <h2 
             ref={titleRef}
-            className="bento-title special-font text-4xl md:text-6xl font-black uppercase"
+            className="font-black uppercase leading-none mb-3 text-4xl md:text-5xl"
           >
-            {renderAnimatedTitle(title)}
-          </h1>
-          <p className="mt-3 max-w-64 text-xs md:text-base">
+            {title.split('').map((letter, i) => (
+              <span
+                key={i}
+                className="inline-block hover:text-emerald-400 transition-colors duration-300"
+                style={{ 
+                  display: 'inline-block',
+                  textShadow: '0 0 30px rgba(0,0,0,0.5)'
+                }}
+              >
+                {letter}
+              </span>
+            ))}
+          </h2>
+          
+          <p className="text-white/80 text-sm md:text-base max-w-md leading-relaxed">
             {description}
           </p>
         </div>
-        <div className="border-hsla relative flex w-fit cursor-pointer items-center gap-1 overflow-hidden rounded-full bg-emerald-500 px-5 py-2 text-xs uppercase text-white font-medium shadow-lg shadow-emerald-500/30 hover:bg-emerald-400 transition-all duration-300 hover:shadow-emerald-400/50 hover:scale-105">
-          <TiLocationArrow className="relative z-20" />
-          <p className="relative z-20">view program</p>
+
+        {/* Action button with unique hover effect */}
+        <button className="relative group/btn w-fit overflow-hidden rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-white/20 hover:scale-105">
+          <span className="relative z-10 flex items-center gap-2">
+            <TiLocationArrow className="group-hover/btn:translate-x-1 transition-transform" />
+            Explore Program
+          </span>
+          <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-500 bg-gradient-to-r from-emerald-500/30 to-emerald-400/20" />
+        </button>
+      </div>
+
+      {/* Decorative corners */}
+      <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-white/10 rounded-tr-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-white/10 rounded-bl-3xl pointer-events-none" />
+    </div>
+  );
+};
+
+// Feature card for stats/info
+const FeatureCard = ({ icon: Icon, label, value, description, color = "emerald" }) => {
+  const cardRef = useRef(null);
+  
+  useEffect(() => {
+    gsap.fromTo(cardRef.current,
+      { y: 50, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: cardRef.current,
+          start: "top 85%",
+          end: "top 40%",
+          scrub: 1,
+          toggleActions: "play none none reverse",
+        },
+      }
+    );
+  }, []);
+
+  const colorClasses = {
+    emerald: "from-emerald-500/20 to-emerald-600/10 border-emerald-400/20",
+    blue: "from-blue-500/20 to-blue-600/10 border-blue-400/20",
+    purple: "from-purple-500/20 to-purple-600/10 border-purple-400/20",
+    orange: "from-orange-500/20 to-orange-600/10 border-orange-400/20",
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      className={`p-6 rounded-2xl bg-gradient-to-br ${colorClasses[color]} backdrop-blur-sm border shadow-xl`}
+    >
+      <div className="flex items-center gap-4">
+        <div className="p-3 rounded-xl bg-white/10 backdrop-blur-sm">
+          <Icon className="text-2xl text-white" />
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-white">{value}</p>
+          <p className="text-white/80 font-medium">{label}</p>
+          <p className="text-white/60 text-xs mt-1">{description}</p>
         </div>
       </div>
     </div>
   );
 };
 
-const Features = () => (
-  <section className="bg-black pb-52">
-    <div className="container mx-auto px-3 md:px-10">
-      <div className="px-5 py-32">
-        <p className="font-circular-web text-lg text-blue-50">
-          Our Academic Programs
-        </p>
-        <p className="max-w-md font-circular-web text-lg text-blue-50 opacity-50">
-          Explore our diverse range of programs designed to unlock every student's potential.
-        </p>
+// Main Features component
+const Features = () => {
+  const sectionRef = useRef(null);
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    // Header animation with smooth scroll
+    gsap.fromTo(headerRef.current,
+      { y: 50, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1.2,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: headerRef.current,
+          start: "top 90%",
+          toggleActions: "play none none reverse",
+        },
+      }
+    );
+
+    // Particle floating animation for background
+    const particles = document.querySelectorAll('.particle');
+    particles.forEach((particle, i) => {
+      gsap.to(particle, {
+        y: -30 - (i * 10),
+        x: 20 + (i * 5),
+        duration: 3 + i,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: i * 0.2,
+      });
+    });
+
+    // Smooth scroll cleanup
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
+  }, []);
+
+  const programs = [
+    {
+      title: "BSIS",
+      description: "Technology, business, and systems innovation.",
+      icon: FaRocket,
+      color: "blue",
+      src: "/videos/bsis.mp4",
+    },
+    {
+      title: "BSBIO",
+      description: "Exploring life, science, and discovery.",
+      icon: FaDna,
+      color: "emerald",
+      src: "/videos/bsbio.mp4",
+    },
+    {
+      title: "BPED",
+      description: "Shaping healthy, active, skilled individuals.",
+      icon: FaRunning,
+      color: "orange",
+      src: "/videos/bped.mp4",
+    },
+    {
+      title: "BSCRIM",
+      description: "Justice, safety, and community service.",
+      icon: FaGavel,
+      color: "red",
+      src: "/videos/bscrim.mp4",
+    },
+    {
+      title: "BTVTED",
+      description: "Technical-Vocational Teacher Education.",
+      icon: FaGraduationCap,
+      color: "purple",
+      src: "/videos/btvted.mp4",
+    },
+    {
+      title: "BSA",
+      description: "Agricultural Sciences for sustainable future.",
+      icon: FaSeedling,
+      color: "emerald",
+      src: "/videos/bsa.mp4",
+    },
+  ];
+
+  const stats = [
+    { icon: FaGraduationCap, value: "98%", label: "Graduation Rate", description: "students succeed", color: "emerald" },
+    { icon: FaRocket, value: "30+", label: "Programs", description: "diverse offerings", color: "blue" },
+    { icon: FaAtom, value: "1,200+", label: "Students", description: "active learners", color: "purple" },
+  ];
+
+  return (
+    <section ref={sectionRef} className="relative min-h-screen py-24 px-4 md:px-8 overflow-hidden bg-black">
+      {/* Animated background particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="particle absolute w-1 h-1 rounded-full bg-emerald-500/20"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${i * 0.2}s`,
+            }}
+          />
+        ))}
       </div>
 
-      <BentoTilt className="border-hsla relative mb-7 h-96 w-full overflow-hidden rounded-md md:h-[65vh]">
-        <BentoCard
-          src="/videos/bsis.mp4"
-          title="BSIS"
-          description="Technology, business, and systems working together."
-          isComingSoon
-          highlightIndex={[2, 2]} // Highlight the 'I' in BSIS
-        />
-      </BentoTilt>
+      <div className="container mx-auto max-w-7xl relative z-10">
+        {/* Unique Header with circular design */}
+        <div ref={headerRef} className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-medium uppercase tracking-widest text-white/60">Innovation Hub</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-none mb-4">
+            Academic
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+              Excellence
+            </span>
+          </h2>
+          
+          <p className="max-w-2xl mx-auto text-white/60 text-sm md:text-base">
+            Discover transformative programs designed to unlock your potential 
+            and shape the future of your career.
+          </p>
+        </div>
 
-      <div className="grid h-[135vh] w-full grid-cols-2 grid-rows-3 gap-7">
-        <BentoTilt className="bento-tilt_1 row-span-1 md:col-span-1 md:row-span-2">
-          <BentoCard
-            src="/videos/bsbio.mp4"
-            title="BSBIO"
-            description="Exploring life, science, and the living world."
-            isComingSoon
-            highlightIndex={[3, 5]} // Highlight 'BIO'
-          />
-        </BentoTilt>
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+          {stats.map((stat, i) => (
+            <FeatureCard key={i} {...stat} />
+          ))}
+        </div>
 
-        <BentoTilt className="bento-tilt_1 row-span-1 ms-32 md:col-span-1 md:ms-0">
-          <BentoCard
-            src="/videos/bped.mp4"
-            title="BPED"
-            description="Shaping active, healthy, and skilled individuals through physical education."
-            isComingSoon
-            highlightIndex={[2, 2]} // Highlight the 'E' in BPED
-          />
-        </BentoTilt>
+        {/* Program Grid - Uniform height with smooth scroll */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+          {programs.map((program, index) => (
+            <GlassTilt key={index} className="h-full">
+              <ProgramCard 
+                {...program}
+                index={index}
+              />
+            </GlassTilt>
+          ))}
+        </div>
 
-        <BentoTilt className="bento-tilt_1 me-14 md:col-span-1 md:me-0">
-          <BentoCard
-            src="/videos/bscrim.mp4"
-            title="BSCRIM"
-            description="Justice, safety, and service for a better community."
-            isComingSoon
-            highlightIndex={[2, 2]} // Highlight the 'C' in BSCRIM
-          />
-        </BentoTilt>
-
-        {/* More Programs - BTVTED Video */}
-        <BentoTilt className="bento-tilt_2">
-          <ProgramCard
-            src="/videos/btvted.mp4"
-            title="BTVTED"
-            description="Technical-Vocational Teacher Education for future educators."
-            highlightIndex={[4, 5]} // Highlight 'ED'
-          />
-        </BentoTilt>
-
-        {/* BSA Video */}
-        <BentoTilt className="bento-tilt_2">
-          <ProgramCard
-            src="/videos/bsa.mp4"
-            title="BSA"
-            description="Agricultural Sciences for sustainable farming and development."
-            highlightIndex={[2, 2]} // Highlight the 'A' in BSA
-          />
-        </BentoTilt>
+        {/* Bottom CTA */}
+        <div className="mt-16 text-center">
+          <button className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 text-white font-semibold text-sm uppercase tracking-wider shadow-2xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-105">
+            <span>Explore All Programs</span>
+            <TiLocationArrow className="group-hover:translate-x-1 transition-transform" />
+            <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
+          </button>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
-export default Features;
+export default Features;  
