@@ -127,8 +127,8 @@ const LoadingScreen = ({ onComplete }) => {
         <CoreEmblem ref={coreRef} />
       </div>
 
-      {/* Educational Status & Progress */}
-      <div ref={textRef} className="flex flex-col items-center gap-3.5 mt-2">
+      {/* Educational Status & Progress - Added more spacing with mt-8 */}
+      <div ref={textRef} className="flex flex-col items-center gap-3.5 mt-8">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
           <span className="text-xs font-semibold tracking-[0.25em] text-emerald-200/90 uppercase font-sans">
