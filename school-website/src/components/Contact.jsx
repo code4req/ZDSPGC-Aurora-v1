@@ -307,7 +307,7 @@ const Contact = () => {
           <video
             src="/videos/bsa.mp4"
             autoPlay
-            muted
+            muted 
             loop
             playsInline
             className="absolute left-0 top-0 w-full h-full object-cover scale-125"
