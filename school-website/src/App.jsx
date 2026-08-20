@@ -238,9 +238,6 @@ function App() {
         />
       )}
 
-      {/* ======================================================
-          PUBLIC WEBSITE
-      ====================================================== */}
 
       {!loading && !pageLoading && (
         <>
@@ -257,21 +254,15 @@ function App() {
             currentPage={currentPage}
           />
 
-          {/* ==================================================
-              HOME
-          ================================================== */}
-
           {currentPage === "home" && (
             <>
               <Hero />
-
               <div className="bg-white">
                 <Welcome />
-                <Features />
+                <Features onExploreAll={navigateToCourses} />
                 <Story />
-              </div>
-
-              <Footer />
+            </div>
+            <Footer />
             </>
           )}
 

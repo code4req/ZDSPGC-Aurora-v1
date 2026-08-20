@@ -30,9 +30,6 @@ const NavBar = ({
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  // ============================================================
-  // AUDIO
-  // ============================================================
 
   const toggleAudioIndicator = () => {
     setIsAudioPlaying((prev) => !prev);
@@ -49,9 +46,6 @@ const NavBar = ({
     }
   }, [isAudioPlaying]);
 
-  // ============================================================
-  // NAVBAR SCROLL BEHAVIOR
-  // ============================================================
 
   useEffect(() => {
     if (!navContainerRef.current) return;
@@ -81,9 +75,6 @@ const NavBar = ({
     });
   }, [isNavVisible]);
 
-  // ============================================================
-  // NAVIGATION
-  // ============================================================
 
   const handleNavClick = (e, item) => {
     if (item === "About" && currentPage !== "about") {
@@ -109,9 +100,6 @@ const NavBar = ({
     }
   };
 
-  // ============================================================
-  // ADMIN LOGIN MODAL
-  // ============================================================
 
   const handleAdminLogin = () => {
     // Close mobile menu first
@@ -121,9 +109,6 @@ const NavBar = ({
     onAdminLoginClick?.();
   };
 
-  // ============================================================
-  // STYLING
-  // ============================================================
 
   const getLinkColor = () =>
     "text-white font-FK Screamer Black font-medium opacity-80 hover:opacity-100 transition-opacity tracking-[0.15em]";
