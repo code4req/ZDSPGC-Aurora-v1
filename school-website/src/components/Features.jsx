@@ -1,90 +1,7 @@
-import { useRef } from "react";
+// Features.jsx
 import { TiLocationArrow } from "react-icons/ti";
 import { FaGraduationCap, FaRocket, FaAtom, FaDna, FaRunning, FaGavel, FaSeedling } from 'react-icons/fa';
-
-// Main card component with uniform height
-export const ProgramCard = ({ 
-  src, 
-  title, 
-  description, 
-  icon: Icon, 
-  color = "emerald",
-  onExplore
-}) => {
-  const colorMap = {
-    emerald: { bg: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20" },
-    blue: { bg: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20" },
-    purple: { bg: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20" },
-    orange: { bg: "from-orange-500/20 to-amber-500/20", border: "border-orange-400/30", glow: "shadow-orange-500/20" },
-    red: { bg: "from-red-500/20 to-rose-500/20", border: "border-red-400/30", glow: "shadow-red-500/20" },
-  };
-
-  const colors = colorMap[color] || colorMap.emerald;
-
-  const handleExplore = () => {
-    if (onExplore) onExplore();
-  };
-
-  return (
-    <div
-      className={`relative group overflow-hidden rounded-3xl backdrop-blur-xl bg-gradient-to-br ${colors.bg} border ${colors.border} shadow-2xl ${colors.glow} h-[400px] w-full transition-all duration-300 hover:scale-[1.02]`}
-    >
-      {/* Animated background video with overlay */}
-      <div className="absolute inset-0 overflow-hidden">
-        <video
-          src={src}
-          loop
-          muted
-          autoPlay
-          className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-300"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-between p-8 text-white">
-        <div className="flex items-start justify-between">
-          {/* Icon */}
-          <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
-            {Icon && <Icon className="text-3xl text-white" />}
-          </div>
-          
-          {/* Program badge */}
-          <span className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium uppercase tracking-wider">
-            Program
-          </span>
-        </div>
-
-        <div>
-          {/* Title */}
-          <h2 className="font-black uppercase leading-none mb-3 text-4xl md:text-5xl">
-            {title}
-          </h2>
-          
-          <p className="text-white/80 text-sm md:text-base max-w-md leading-relaxed">
-            {description}
-          </p>
-        </div>
-
-        {/* Action button */}
-        <button 
-          onClick={handleExplore}
-          className="relative group/btn w-fit overflow-hidden rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-white/20 hover:scale-105 cursor-pointer"
-        >
-          <span className="relative z-10 flex items-center gap-2">
-            <TiLocationArrow className="group-hover/btn:translate-x-1 transition-transform" />
-            Explore Program
-          </span>
-          <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-300 bg-gradient-to-r from-emerald-500/30 to-emerald-400/20" />
-        </button>
-      </div>
-
-      {/* Decorative corners */}
-      <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-white/10 rounded-tr-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-white/10 rounded-bl-3xl pointer-events-none" />
-    </div>
-  );
-};
+import AccordionGallery from './AccordionGallery';
 
 // Feature card for stats/info
 const FeatureCard = ({ icon: Icon, label, value, description, color = "emerald" }) => {
@@ -96,7 +13,7 @@ const FeatureCard = ({ icon: Icon, label, value, description, color = "emerald" 
   };
 
   return (
-    <div className={`p-6 rounded-2xl bg-gradient-to-br ${colorClasses[color]} backdrop-blur-sm border shadow-xl`}>
+    <div className={`p-6 rounded-2xl bg-gradient-to-br ${colorClasses[color]} backdrop-blur-sm border shadow-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}>
       <div className="flex items-center gap-4">
         <div className="p-3 rounded-xl bg-white/10 backdrop-blur-sm">
           <Icon className="text-2xl text-white" />
@@ -117,48 +34,59 @@ const Features = ({ onExploreAll }) => {
     if (onExploreAll) onExploreAll();
   };
 
+  const handleExploreProgram = (item) => {
+    console.log('Exploring program:', item);
+    if (onExploreAll) onExploreAll(item);
+  };
+
   const programs = [
     {
       title: "BSIS",
       description: "Technology, business, and systems innovation.",
+      video: "/videos/bsis.mp4",
+      fallbackImage: "https://picsum.photos/seed/bsis/900/1200",
+      color: "#3b82f6",
       icon: FaRocket,
-      color: "blue",
-      src: "/videos/bsis.mp4",
     },
     {
       title: "BSBIO",
       description: "Exploring life, science, and discovery.",
+      video: "/videos/bsbio.mp4",
+      fallbackImage: "https://picsum.photos/seed/bsbio/900/1200",
+      color: "#34d399",
       icon: FaDna,
-      color: "emerald",
-      src: "/videos/bsbio.mp4",
     },
     {
       title: "BPED",
       description: "Shaping healthy, active, skilled individuals.",
+      video: "/videos/bped.mp4",
+      fallbackImage: "https://picsum.photos/seed/bped/900/1200",
+      color: "#fb923c",
       icon: FaRunning,
-      color: "orange",
-      src: "/videos/bped.mp4",
     },
     {
       title: "BSCRIM",
       description: "Justice, safety, and community service.",
+      video: "/videos/bscrim.mp4",
+      fallbackImage: "https://picsum.photos/seed/bscrim/900/1200",
+      color: "#f87171",
       icon: FaGavel,
-      color: "red",
-      src: "/videos/bscrim.mp4",
     },
     {
       title: "BTVTED",
       description: "Technical-Vocational Teacher Education.",
+      video: "/videos/btvted.mp4",
+      fallbackImage: "https://picsum.photos/seed/btvted/900/1200",
+      color: "#a78bfa",
       icon: FaGraduationCap,
-      color: "purple",
-      src: "/videos/btvted.mp4",
     },
     {
       title: "BSA",
       description: "Agricultural Sciences for sustainable future.",
+      video: "/videos/bsa.mp4",
+      fallbackImage: "https://picsum.photos/seed/bsa/900/1200",
+      color: "#34d399",
       icon: FaSeedling,
-      color: "emerald",
-      src: "/videos/bsa.mp4",
     },
   ];
 
@@ -168,13 +96,25 @@ const Features = ({ onExploreAll }) => {
     { icon: FaAtom, value: "1,200+", label: "Students", description: "active learners", color: "purple" },
   ];
 
+  // Convert programs to gallery items with video support
+  const galleryItems = programs.map(p => ({
+    video: p.video,
+    image: p.fallbackImage,
+    label: p.title,
+    description: p.description,
+    link: '#',
+    color: p.color,
+    icon: p.icon,
+    originalData: p
+  }));
+
   return (
     <section className="relative min-h-screen py-24 px-4 md:px-8 bg-black">
       <div className="container mx-auto max-w-7xl relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs font-medium uppercase tracking-widest text-white/60">Innovation Hub</span>
           </div>
           
@@ -198,14 +138,68 @@ const Features = ({ onExploreAll }) => {
           ))}
         </div>
 
-        {/* Program Grid - Uniform height */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-          {programs.map((program, index) => (
-            <ProgramCard 
-              key={index}
-              {...program}
-              onExplore={onExploreAll}
+        {/* Gallery Section */}
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-2xl md:text-3xl font-bold text-white">
+              Our <span className="text-emerald-400">Programs</span>
+            </h3>
+            <p className="text-white/50 text-sm mt-1 flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Hover or click to explore each program
+            </p>
+          </div>
+          <button 
+            onClick={handleExploreAll}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300 text-sm hover:scale-105"
+          >
+            <span>View All Programs</span>
+            <TiLocationArrow className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+
+        {/* Accordion Gallery with Videos */}
+        <div className="mb-16 relative">
+          {/* Gradient glow behind gallery */}
+          <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/5 via-transparent to-emerald-500/5 blur-2xl rounded-3xl" />
+          <div className="relative">
+            <AccordionGallery
+              items={galleryItems}
+              defaultIndex={2}
+              expandRatio={0.5}
+              trigger="hover"
+              accentColor="#34d399"
+              overlayColor="#000000"
+              textColor="#ffffff"
+              height={480}
+              gap={12}
+              radius={20}
+              duration={0.7}
+              parallax={0.4}
+              tilt={5}
+              grayscale={true}
+              onExplore={handleExploreProgram}
             />
+          </div>
+        </div>
+
+        {/* Programs Overview Grid - Shows all programs with icons */}
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {programs.map((program, index) => (
+            <div
+              key={index}
+              onClick={() => handleExploreProgram(galleryItems[index])}
+              className="group p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 cursor-pointer hover:bg-white/10 hover:scale-105 text-center"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <div className="p-3 rounded-xl bg-white/10 group-hover:bg-emerald-500/20 transition-colors duration-300">
+                  <program.icon className="text-2xl text-white/70 group-hover:text-emerald-400 transition-colors duration-300" />
+                </div>
+                <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors duration-300">
+                  {program.title}
+                </span>
+              </div>
+            </div>
           ))}
         </div>
 
@@ -220,6 +214,13 @@ const Features = ({ onExploreAll }) => {
             <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
           </button>
         </div>
+      </div>
+
+      {/* Background decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-2000" />
       </div>
     </section>
   );
