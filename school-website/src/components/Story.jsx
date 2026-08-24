@@ -1,10 +1,11 @@
+// Story.jsx
 import gsap from "gsap";
 import { useRef } from "react";
 
 import Button from "./Button";
 import AnimatedTitle from "./AnimatedTitle";
 
-const Story = () => {
+const Story = ({ onNavigate }) => {
   const frameRef = useRef(null);
 
   const handleMouseMove = (e) => {
@@ -42,6 +43,13 @@ const Story = () => {
         rotateY: 0,
         ease: "power1.inOut",
       });
+    }
+  };
+
+  // Handle button click - navigate to About
+  const handleStoryClick = () => {
+    if (onNavigate) {
+      onNavigate(); // This will trigger the navigation with loading screen
     }
   };
 
@@ -112,6 +120,7 @@ const Story = () => {
             <Button
               id="story-btn"
               title="Read Our Story"
+              onClick={handleStoryClick}
               containerClass="group relative mt-5 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-full shadow-lg hover:shadow-2xl hover:shadow-green-500/40 hover:scale-105 transition-all duration-300 overflow-hidden border border-green-400/30"
             >
               <span className="relative z-10 flex items-center gap-2 text-sm">

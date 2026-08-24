@@ -136,6 +136,7 @@ const Events = () => {
 
   // SUPABASE
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const heroRef = useRef(null);
   const featuredRef = useRef(null);
@@ -177,27 +178,31 @@ const Events = () => {
 
   /*
   ============================================================
-  SUPABASE EVENTS
+  SUPABASE EVENTS - FETCH NEWEST FIRST
   ============================================================
   */
 
   useEffect(() => {
     const fetchEvents = async () => {
+      setLoading(true);
+      
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .order("event_date", {
-          ascending: true
+        .order("created_at", {
+          ascending: false  // NEWEST FIRST
         });
 
       if (error) {
         console.error("Error fetching events:", error);
+        setLoading(false);
         return;
       }
 
-      console.log("Events from Supabase:", data);
+      console.log("Events from Supabase (newest first):", data);
 
       setEvents(data || []);
+      setLoading(false);
     };
 
     fetchEvents();
@@ -275,12 +280,12 @@ const Events = () => {
 
   /*
   ============================================================
-  SAME FEATURED EVENT LOGIC
-  First 3 Supabase events become featured.
+  FEATURED EVENT - ONLY THE NEWEST EVENT
   ============================================================
   */
 
-  const featuredEvents = formattedEvents.slice(0, 3);
+  // Get the single newest event (first item since we ordered by created_at DESC)
+  const featuredEvent = formattedEvents.length > 0 ? [formattedEvents[0]] : [];
 
   /*
   ============================================================
@@ -299,9 +304,17 @@ const Events = () => {
 
   /*
   ============================================================
-  IMPORTANT:
-  ORIGINAL SQUARE TRANSITION LOGIC
-  IS KEPT UNCHANGED.
+  RESET SLIDE WHEN FEATURED EVENT CHANGES
+  ============================================================
+  */
+
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [featuredEvent.length]);
+
+  /*
+  ============================================================
+  GSAP ANIMATIONS
   ============================================================
   */
 
@@ -461,7 +474,7 @@ const Events = () => {
         </div>
       </div>
 
-      {/* FEATURED CAROUSEL */}
+      {/* FEATURED REALM - SHOWING NEWEST EVENT */}
 
       <div
         ref={featuredRef}
@@ -470,7 +483,7 @@ const Events = () => {
         <div className="flex items-end justify-between mb-12">
           <div>
             <p className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-2">
-              Spotlight
+              Latest Event
             </p>
 
             <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-emerald-50">
@@ -483,11 +496,11 @@ const Events = () => {
               onClick={() =>
                 setCurrentSlide(
                   (prev) =>
-                    (prev - 1 + featuredEvents.length) %
-                    featuredEvents.length
+                    (prev - 1 + featuredEvent.length) %
+                    featuredEvent.length
                 )
               }
-              disabled={featuredEvents.length === 0}
+              disabled={featuredEvent.length === 0 || featuredEvent.length <= 1}
               className="h-12 w-12 rounded-full border border-emerald-500/30 bg-emerald-950/80 flex items-center justify-center text-emerald-200 hover:bg-emerald-400 hover:text-black transition-all disabled:opacity-30"
             >
               <FaChevronLeft className="text-sm" />
@@ -498,10 +511,10 @@ const Events = () => {
                 setCurrentSlide(
                   (prev) =>
                     (prev + 1) %
-                    featuredEvents.length
+                    featuredEvent.length
                 )
               }
-              disabled={featuredEvents.length === 0}
+              disabled={featuredEvent.length === 0 || featuredEvent.length <= 1}
               className="h-12 w-12 rounded-full border border-emerald-500/30 bg-emerald-950/80 flex items-center justify-center text-emerald-200 hover:bg-emerald-400 hover:text-black transition-all disabled:opacity-30"
             >
               <FaChevronRight className="text-sm" />
@@ -511,14 +524,26 @@ const Events = () => {
 
         <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-emerald-950/40 p-8 md:p-14 backdrop-blur-md">
 
-          {featuredEvents.length === 0 ? (
+          {loading ? (
             <div className="min-h-[300px] flex items-center justify-center">
-              <p className="text-emerald-300/60 font-mono text-sm uppercase tracking-widest">
-                Loading Events...
-              </p>
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-12 w-12 rounded-full border-4 border-emerald-500/30 border-t-emerald-400 animate-spin" />
+                <p className="text-emerald-300/60 font-mono text-sm uppercase tracking-widest">
+                  Loading latest event...
+                </p>
+              </div>
+            </div>
+          ) : featuredEvent.length === 0 ? (
+            <div className="min-h-[300px] flex items-center justify-center">
+              <div className="text-center">
+                <FaCalendarAlt className="text-6xl text-emerald-500/20 mx-auto mb-4" />
+                <p className="text-emerald-300/60 font-mono text-sm uppercase tracking-widest">
+                  No events yet. Check back soon!
+                </p>
+              </div>
             </div>
           ) : (
-            featuredEvents.map((event, index) => {
+            featuredEvent.map((event, index) => {
               if (index !== currentSlide) return null;
 
               const Icon = event.icon;
@@ -562,6 +587,17 @@ const Events = () => {
                         {event.location}
                       </span>
                     </div>
+
+                    {/* NEW: Show when event was created */}
+                    {event.created_at && (
+                      <div className="text-xs text-emerald-500/50 font-mono">
+                        Added {new Date(event.created_at).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric"
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div className="lg:col-span-5 flex justify-center">
@@ -580,6 +616,11 @@ const Events = () => {
                       <span className="text-xs font-mono text-emerald-500 uppercase mt-1">
                         Expected Attendees
                       </span>
+
+                      {/* NEW: Badge to show it's the latest */}
+                      <div className="absolute -top-3 -right-3 bg-emerald-400 text-black text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-wider shadow-lg">
+                        Latest
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import gsap from "gsap";
 import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState } from "react";
-import { FaBars, FaTimes, FaLock } from "react-icons/fa";
+import { FaBars, FaTimes } from "react-icons/fa";
 import { TiLocationArrow } from "react-icons/ti";
 
 import Button from "./Button";
@@ -15,7 +15,6 @@ const NavBar = ({
   onAboutClick,
   onCoursesClick,
   onEventsClick,
-  onAdminLoginClick,
   currentPage,
 }) => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -29,7 +28,6 @@ const NavBar = ({
 
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-
 
   const toggleAudioIndicator = () => {
     setIsAudioPlaying((prev) => !prev);
@@ -45,7 +43,6 @@ const NavBar = ({
       audioElementRef.current.pause();
     }
   }, [isAudioPlaying]);
-
 
   useEffect(() => {
     if (!navContainerRef.current) return;
@@ -75,7 +72,6 @@ const NavBar = ({
     });
   }, [isNavVisible]);
 
-
   const handleNavClick = (e, item) => {
     if (item === "About" && currentPage !== "about") {
       e.preventDefault();
@@ -99,16 +95,6 @@ const NavBar = ({
       setIsMobileMenuOpen(false);
     }
   };
-
-
-  const handleAdminLogin = () => {
-    // Close mobile menu first
-    setIsMobileMenuOpen(false);
-
-    // Open AdminLogin modal from parent component
-    onAdminLoginClick?.();
-  };
-
 
   const getLinkColor = () =>
     "text-white font-FK Screamer Black font-medium opacity-80 hover:opacity-100 transition-opacity tracking-[0.15em]";
@@ -221,22 +207,6 @@ const NavBar = ({
             </div>
 
             {/* ==================================================
-                DESKTOP ADMIN LOGIN
-            ================================================== */}
-
-            <button
-              type="button"
-              onClick={handleAdminLogin}
-              className="hidden md:flex ml-8 items-center gap-2 px-5 py-2.5 rounded-full border border-emerald-400/50 bg-emerald-950/40 text-white text-xs font-semibold uppercase tracking-wider backdrop-blur-sm transition-all duration-300 hover:bg-emerald-500 hover:border-emerald-400 hover:text-black hover:shadow-lg hover:shadow-emerald-500/30 hover:scale-105"
-              aria-label="Open Admin Login"
-            >
-              <FaLock className="text-xs" />
-
-    
-
-            </button>
-
-            {/* ==================================================
                 AUDIO INDICATOR
             ================================================== */}
 
@@ -329,19 +299,6 @@ const NavBar = ({
                 rightIcon={<TiLocationArrow />}
                 containerClass="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold transition-all duration-300 mt-2 tracking-wide"
               />
-
-              {/* ==================================================
-                  MOBILE ADMIN LOGIN
-              ================================================== */}
-
-              <button
-                type="button"
-                onClick={handleAdminLogin}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 text-white text-sm font-semibold uppercase tracking-wider transition-all duration-300 hover:bg-emerald-500 hover:text-black hover:border-emerald-400 mt-1"
-              >
-                <FaLock />
-
-              </button>
 
             </div>
 

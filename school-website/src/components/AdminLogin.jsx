@@ -17,7 +17,10 @@ const AdminLogin = ({ onLogin, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Prevent background scrolling while modal is open
+  // =========================================================
+  // PREVENT BACKGROUND SCROLLING
+  // =========================================================
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
 
@@ -26,7 +29,10 @@ const AdminLogin = ({ onLogin, onClose }) => {
     };
   }, []);
 
-  // Close with ESC key
+  // =========================================================
+  // CLOSE WITH ESC KEY
+  // =========================================================
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
@@ -41,36 +47,139 @@ const AdminLogin = ({ onLogin, onClose }) => {
     };
   }, [onClose]);
 
+  // =========================================================
+  // LOGIN
+  // =========================================================
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions
+    if (loading) return;
 
     setLoading(true);
     setError("");
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      // =======================================================
+      // STEP 1: AUTHENTICATE WITH SUPABASE
+      // =======================================================
 
-    if (error) {
-      setError(error.message);
+      const {
+        data,
+        error: loginError,
+      } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      // Supabase authentication failed
+      if (loginError) {
+        console.error("Supabase login error:", loginError);
+
+        setError(
+          loginError.message ||
+            "Invalid email or password."
+        );
+
+        setLoading(false);
+        return;
+      }
+
+      // No user returned
+      if (!data?.user) {
+        setError("Unable to authenticate your account.");
+        setLoading(false);
+        return;
+      }
+
+      const user = data.user;
+
+      // =======================================================
+      // STEP 2: CHECK ADMIN_USERS TABLE
+      // =======================================================
+
+      const {
+        data: admin,
+        error: adminError,
+      } = await supabase
+        .from("admin_users")
+        .select("id, email, role")
+        .eq("id", user.id)
+        .single();
+
+      // =======================================================
+      // STEP 3: VERIFY ADMIN ROLE
+      // =======================================================
+
+      if (
+        adminError ||
+        !admin ||
+        admin.role !== "admin"
+      ) {
+        console.warn(
+          "Authenticated user is not an administrator."
+        );
+
+        // Immediately log the user out
+        await supabase.auth.signOut();
+
+        setError(
+          "Access denied. This account is not authorized to access the administration system."
+        );
+
+        setLoading(false);
+        return;
+      }
+
+      // =======================================================
+      // STEP 4: ADMIN VERIFIED
+      // =======================================================
+
+      console.log("Admin authentication successful:", {
+        id: user.id,
+        email: admin.email,
+        role: admin.role,
+      });
+
+      // Pass verified user back to App.jsx
+      onLogin(user);
+
+    } catch (err) {
+      console.error("Admin login error:", err);
+
+      // Make sure an unexpected error doesn't leave
+      // the user authenticated.
+      try {
+        await supabase.auth.signOut();
+      } catch (logoutError) {
+        console.error(
+          "Automatic logout failed:",
+          logoutError
+        );
+      }
+
+      setError(
+        "Something went wrong while signing in. Please try again."
+      );
+    } finally {
       setLoading(false);
-      return;
     }
-
-    if (data?.user) {
-      onLogin(data.user);
-    }
-
-    setLoading(false);
   };
 
-  // Close when clicking the dark background
+  // =========================================================
+  // CLOSE WHEN CLICKING DARK BACKGROUND
+  // =========================================================
+
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div
@@ -78,24 +187,29 @@ const AdminLogin = ({ onLogin, onClose }) => {
       className="fixed inset-0 z-[100] flex items-center justify-center px-5 bg-black/70 backdrop-blur-md"
     >
 
-      {/* Background glow */}
+      {/* =====================================================
+          BACKGROUND GLOW
+      ===================================================== */}
+
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* ======================================================
+      {/* =====================================================
           LOGIN MODAL
-      ====================================================== */}
+      ===================================================== */}
 
       <div className="relative z-10 w-full max-w-md">
 
-        {/* Modal Card */}
-
         <div className="relative rounded-3xl border border-emerald-400/20 bg-zinc-950/95 backdrop-blur-2xl shadow-2xl shadow-black/50 overflow-hidden">
 
-          {/* Top accent */}
+          {/* =================================================
+              TOP ACCENT
+          ================================================= */}
 
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-emerald-400" />
 
-          {/* Close button */}
+          {/* =================================================
+              CLOSE BUTTON
+          ================================================= */}
 
           <button
             onClick={onClose}
@@ -108,9 +222,9 @@ const AdminLogin = ({ onLogin, onClose }) => {
 
           <div className="p-7 sm:p-9">
 
-            {/* ==================================================
+            {/* =================================================
                 HEADER
-            ================================================== */}
+            ================================================= */}
 
             <div className="text-center mb-8">
 
@@ -132,13 +246,15 @@ const AdminLogin = ({ onLogin, onClose }) => {
 
             </div>
 
-            {/* ==================================================
+            {/* =================================================
                 LOGIN FORM
-            ================================================== */}
+            ================================================= */}
 
             <form onSubmit={handleLogin}>
 
-              {/* EMAIL */}
+              {/* =================================================
+                  EMAIL
+              ================================================= */}
 
               <div className="mb-4">
 
@@ -153,18 +269,24 @@ const AdminLogin = ({ onLogin, onClose }) => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError("");
+                    }}
                     placeholder="admin@example.com"
                     required
                     autoComplete="email"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3.5 pl-11 pr-4 text-sm text-white outline-none placeholder:text-white/20 focus:border-emerald-400/60 focus:bg-emerald-500/[0.03] transition-all"
+                    disabled={loading}
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3.5 pl-11 pr-4 text-sm text-white outline-none placeholder:text-white/20 focus:border-emerald-400/60 focus:bg-emerald-500/[0.03] transition-all disabled:opacity-50"
                   />
 
                 </div>
 
               </div>
 
-              {/* PASSWORD */}
+              {/* =================================================
+                  PASSWORD
+              ================================================= */}
 
               <div className="mb-5">
 
@@ -177,19 +299,32 @@ const AdminLogin = ({ onLogin, onClose }) => {
                   <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/60 text-sm" />
 
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError("");
+                    }}
                     placeholder="••••••••"
                     required
                     autoComplete="current-password"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3.5 pl-11 pr-12 text-sm text-white outline-none placeholder:text-white/20 focus:border-emerald-400/60 focus:bg-emerald-500/[0.03] transition-all"
+                    disabled={loading}
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3.5 pl-11 pr-12 text-sm text-white outline-none placeholder:text-white/20 focus:border-emerald-400/60 focus:bg-emerald-500/[0.03] transition-all disabled:opacity-50"
                   />
 
                   <button
                     type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-emerald-400 transition-colors"
+                    onClick={() =>
+                      setShowPassword(
+                        (prev) => !prev
+                      )
+                    }
+                    disabled={loading}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-emerald-400 transition-colors disabled:opacity-30"
                     aria-label={
                       showPassword
                         ? "Hide password"
@@ -207,29 +342,37 @@ const AdminLogin = ({ onLogin, onClose }) => {
 
               </div>
 
-              {/* ERROR */}
+              {/* =================================================
+                  ERROR MESSAGE
+              ================================================= */}
 
               {error && (
                 <div className="mb-5 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3">
 
-                  <p className="text-xs text-red-400">
+                  <p className="text-xs leading-relaxed text-red-400">
                     {error}
                   </p>
 
                 </div>
               )}
 
-              {/* LOGIN BUTTON */}
+              {/* =================================================
+                  LOGIN BUTTON
+              ================================================= */}
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={
+                  loading ||
+                  !email.trim() ||
+                  !password
+                }
                 className="w-full flex items-center justify-center gap-3 rounded-xl bg-emerald-400 py-3.5 text-xs font-bold uppercase tracking-[0.15em] text-black hover:bg-emerald-300 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
 
                 {loading ? (
                   <span className="animate-pulse">
-                    Signing In...
+                    Verifying Access...
                   </span>
                 ) : (
                   <>
@@ -242,7 +385,9 @@ const AdminLogin = ({ onLogin, onClose }) => {
 
             </form>
 
-            {/* FOOTER */}
+            {/* =================================================
+                FOOTER
+            ================================================= */}
 
             <p className="text-center text-[9px] font-mono uppercase tracking-[0.2em] text-white/20 mt-6">
               ZDSPGC • Administration System

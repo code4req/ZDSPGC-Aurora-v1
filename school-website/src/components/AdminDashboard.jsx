@@ -4,16 +4,113 @@ import {
   FaSignOutAlt,
   FaPlus,
   FaHome,
+  FaTimes,
+  FaImage,
+  FaMapMarkerAlt,
+  FaClock,
+  FaInfoCircle,
+  FaUsers,
 } from "react-icons/fa";
 
 import { supabase } from "../lib/supabase";
 
 const AdminDashboard = ({ user, onLogout }) => {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState({ type: "", message: "" });
+
+  // Form state - updated to match your schema
+  const [eventData, setEventData] = useState({
+    title: "",
+    description: "",
+    event_date: "",
+    location: "",
+    image_url: "",
+    category: "",
+    attendees: "",
+  });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     onLogout();
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEventData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormStatus({ type: "", message: "" });
+
+    try {
+      // Validate required fields
+      if (!eventData.title || !eventData.event_date || !eventData.location) {
+        throw new Error("Please fill in all required fields (Title, Date, Location)");
+      }
+
+      // Prepare data for insertion - only include fields that exist in your schema
+      const insertData = {
+        title: eventData.title,
+        description: eventData.description || null,
+        event_date: eventData.event_date,
+        location: eventData.location,
+        image_url: eventData.image_url || null,
+        category: eventData.category || null,
+        attendees: eventData.attendees ? parseInt(eventData.attendees) : null,
+        created_at: new Date().toISOString(),
+      };
+
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from("events")
+        .insert([insertData])
+        .select();
+
+      if (error) throw error;
+
+      setFormStatus({
+        type: "success",
+        message: "✅ Event created successfully!",
+      });
+
+      // Reset form
+      setEventData({
+        title: "",
+        description: "",
+        event_date: "",
+        location: "",
+        image_url: "",
+        category: "",
+        attendees: "",
+      });
+
+    } catch (error) {
+      setFormStatus({
+        type: "error",
+        message: `❌ ${error.message}`,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const clearForm = () => {
+    setEventData({
+      title: "",
+      description: "",
+      event_date: "",
+      location: "",
+      image_url: "",
+      category: "",
+      attendees: "",
+    });
+    setFormStatus({ type: "", message: "" });
   };
 
   return (
@@ -188,9 +285,191 @@ const AdminDashboard = ({ user, onLogout }) => {
                 Add Event
               </h3>
 
-              <p className="text-emerald-100/50 mt-3">
-                The event creation form will be added next.
-              </p>
+              {/* EVENT FORM */}
+
+              <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+
+                {/* Status Messages */}
+
+                {formStatus.message && (
+                  <div className={`p-4 rounded-xl border ${
+                    formStatus.type === "success"
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                      : "border-red-500/30 bg-red-500/10 text-red-300"
+                  }`}>
+                    {formStatus.message}
+                  </div>
+                )}
+
+                {/* Title (Required) */}
+
+                <div>
+                  <label className="block text-sm font-medium uppercase tracking-wider text-emerald-300 mb-2">
+                    Event Title <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={eventData.title}
+                    onChange={handleInputChange}
+                    placeholder="e.g., School Foundation Day"
+                    className="w-full px-5 py-3.5 rounded-xl bg-zinc-900 border border-emerald-500/20 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Description (Optional) */}
+
+                <div>
+                  <label className="block text-sm font-medium uppercase tracking-wider text-emerald-300 mb-2">
+                    <FaInfoCircle className="inline mr-2" />
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={eventData.description}
+                    onChange={handleInputChange}
+                    placeholder="Describe the event..."
+                    rows="4"
+                    className="w-full px-5 py-3.5 rounded-xl bg-zinc-900 border border-emerald-500/20 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:outline-none transition-all resize-y"
+                  />
+                </div>
+
+                {/* Event Date (Required) */}
+
+                <div>
+                  <label className="block text-sm font-medium uppercase tracking-wider text-emerald-300 mb-2">
+                    <FaCalendarAlt className="inline mr-2" />
+                    Event Date <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="event_date"
+                    value={eventData.event_date}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3.5 rounded-xl bg-zinc-900 border border-emerald-500/20 text-white focus:border-emerald-400 focus:outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Location (Required) */}
+
+                <div>
+                  <label className="block text-sm font-medium uppercase tracking-wider text-emerald-300 mb-2">
+                    <FaMapMarkerAlt className="inline mr-2" />
+                    Location <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={eventData.location}
+                    onChange={handleInputChange}
+                    placeholder="e.g., School Campus"
+                    className="w-full px-5 py-3.5 rounded-xl bg-zinc-900 border border-emerald-500/20 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Image URL (Optional) */}
+
+                <div>
+                  <label className="block text-sm font-medium uppercase tracking-wider text-emerald-300 mb-2">
+                    <FaImage className="inline mr-2" />
+                    Image URL
+                  </label>
+                  <input
+                    type="url"
+                    name="image_url"
+                    value={eventData.image_url}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full px-5 py-3.5 rounded-xl bg-zinc-900 border border-emerald-500/20 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:outline-none transition-all"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1.5">
+                    Optional. Upload an image for the event banner.
+                  </p>
+                </div>
+
+                {/* Category (Optional) */}
+
+                <div>
+                  <label className="block text-sm font-medium uppercase tracking-wider text-emerald-300 mb-2">
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={eventData.category}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3.5 rounded-xl bg-zinc-900 border border-emerald-500/20 text-white focus:border-emerald-400 focus:outline-none transition-all"
+                  >
+                    <option value="">Select a category</option>
+                    <option value="Academic">Academic</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Cultural">Cultural</option>
+                    <option value="Religious">Religious</option>
+                    <option value="Community">Community</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <p className="text-xs text-zinc-500 mt-1.5">
+                    Optional. Categorize your event for better organization.
+                  </p>
+                </div>
+
+                {/* Attendees (Optional) */}
+
+                <div>
+                  <label className="block text-sm font-medium uppercase tracking-wider text-emerald-300 mb-2">
+                    <FaUsers className="inline mr-2" />
+                    Expected Attendees
+                  </label>
+                  <input
+                    type="number"
+                    name="attendees"
+                    value={eventData.attendees}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 100"
+                    min="0"
+                    className="w-full px-5 py-3.5 rounded-xl bg-zinc-900 border border-emerald-500/20 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:outline-none transition-all"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1.5">
+                    Optional. Estimated number of attendees.
+                  </p>
+                </div>
+
+                {/* Form Actions */}
+
+                <div className="flex flex-wrap gap-4 pt-4 border-t border-emerald-500/10">
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-emerald-500 text-black font-bold uppercase tracking-wider hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="animate-spin">⏳</span>
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <FaPlus />
+                        Create Event
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={clearForm}
+                    className="flex items-center gap-2 px-6 py-3.5 rounded-full border border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all"
+                  >
+                    <FaTimes />
+                    Clear Form
+                  </button>
+
+                </div>
+
+              </form>
 
             </div>
           )}
