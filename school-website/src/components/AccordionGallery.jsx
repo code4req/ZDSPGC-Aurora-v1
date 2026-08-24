@@ -8,42 +8,42 @@ import './Gallery/AccordionGallery.css';
 const DEFAULT_ITEMS = [
   { 
     video: '/videos/bsis.mp4',
-    image: 'https://picsum.photos/id/1015/900/1200', // fallback image
+    image: '/img/Bsis.jpg', // fallback image
     label: 'BSIS', 
     link: '#',
     description: 'Technology, business, and systems innovation.'
   },
   { 
     video: '/videos/bsbio.mp4',
-    image: 'https://picsum.photos/id/1018/900/1200',
+    image: '/img/Bsbio.jpg', // fallback image
     label: 'BSBIO', 
     link: '#',
     description: 'Exploring life, science, and discovery.'
   },
   { 
     video: '/videos/bped.mp4',
-    image: 'https://picsum.photos/id/1039/900/1200',
+    image: '/img/Bped.jpg', // fallback image
     label: 'BPED', 
     link: '#',
     description: 'Shaping healthy, active, skilled individuals.'
   },
   { 
     video: '/videos/bscrim.mp4',
-    image: 'https://picsum.photos/id/1043/900/1200',
+    image: '/img/Bscrim.jpg', // fallback image
     label: 'BSCRIM', 
     link: '#',
     description: 'Justice, safety, and community service.'
   },
   { 
     video: '/videos/btvted.mp4',
-    image: 'https://picsum.photos/id/1044/900/1200',
+    image: '/img/Btvted.jpg', // fallback image
     label: 'BTVTED', 
     link: '#',
     description: 'Technical-Vocational Teacher Education.'
   },
   { 
     video: '/videos/bsa.mp4',
-    image: 'https://picsum.photos/id/1044/900/1200',
+    image: '/img/Bsa.jpg', // fallback image
     label: 'BSA', 
     link: '#',
     description: 'Agricultural Sciences for sustainable future.'
