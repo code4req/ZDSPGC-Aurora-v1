@@ -7,13 +7,21 @@ gsap.registerPlugin(ScrollTrigger);
 const Hero = ({ introReady = false }) => {
   const [currentIndex, setCurrentIndex] = useState(1);
   const [hasClicked, setHasClicked] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const totalVideos = 4;
 
-  const nextVdRef = useRef(null);
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const zdspgcRef = useRef(null);
+
+  // Video refs
+  const currentVideoRef = useRef(null);
+  const nextVideoRef = useRef(null);
+
+  // Transition refs
+  const transitionLayerRef = useRef(null);
+  const miniVideoRef = useRef(null);
 
   const schoolVideos = [
     "/videos/bsis.mp4",
@@ -31,70 +39,196 @@ const Hero = ({ introReady = false }) => {
   };
 
   // =========================================================
+  // NEXT INDEX
+  // =========================================================
+
+  const getNextIndex = () => {
+    return (currentIndex % totalVideos) + 1;
+  };
+
+  // =========================================================
+  // VIDEO TRANSITION
+  // =========================================================
+
+  const changeVideo = (targetIndex = getNextIndex()) => {
+    if (isTransitioning) return;
+
+    if (targetIndex === currentIndex) return;
+
+    setHasClicked(true);
+    setIsTransitioning(true);
+
+    const currentVideo = currentVideoRef.current;
+    const nextVideo = nextVideoRef.current;
+    const transitionLayer = transitionLayerRef.current;
+    const miniVideo = miniVideoRef.current;
+
+    if (!currentVideo || !nextVideo || !transitionLayer) {
+      setCurrentIndex(targetIndex);
+      setIsTransitioning(false);
+      return;
+    }
+
+    // -------------------------------------------------------
+    // Prepare next video
+    // -------------------------------------------------------
+
+    nextVideo.src = getVideoSrc(targetIndex);
+    nextVideo.load();
+
+    nextVideo.currentTime = 0;
+
+    nextVideo
+      .play()
+      .catch(() => {});
+
+    // -------------------------------------------------------
+    // Prepare transition layer
+    // -------------------------------------------------------
+
+    gsap.killTweensOf([
+      nextVideo,
+      transitionLayer,
+      miniVideo,
+    ]);
+
+    gsap.set(transitionLayer, {
+      visibility: "visible",
+      opacity: 1,
+      clipPath: "circle(0% at 50% 50%)",
+      scale: 1,
+    });
+
+    gsap.set(nextVideo, {
+      scale: 1.15,
+    });
+
+    // -------------------------------------------------------
+    // MINI VIDEO EXPANSION
+    // -------------------------------------------------------
+
+    if (miniVideo) {
+      gsap.fromTo(
+        miniVideo,
+        {
+          scale: 0.85,
+        },
+        {
+          scale: 1,
+          duration: 0.65,
+          ease: "power3.out",
+        }
+      );
+    }
+
+    // -------------------------------------------------------
+    // MAIN VIDEO REVEAL
+    // -------------------------------------------------------
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // ---------------------------------------------------
+        // Make next video the current video
+        // ---------------------------------------------------
+
+        currentVideo.src = getVideoSrc(targetIndex);
+        currentVideo.load();
+
+        currentVideo.currentTime = 0;
+
+        currentVideo
+          .play()
+          .catch(() => {});
+
+        // Hide transition layer
+        gsap.set(transitionLayer, {
+          visibility: "hidden",
+          clipPath: "circle(0% at 50% 50%)",
+        });
+
+        gsap.set(nextVideo, {
+          scale: 1,
+        });
+
+        setCurrentIndex(targetIndex);
+        setIsTransitioning(false);
+
+        // Refresh GSAP
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 50);
+      },
+    });
+
+    // -------------------------------------------------------
+    // Slight zoom on current video
+    // -------------------------------------------------------
+
+    tl.to(
+      currentVideo,
+      {
+        scale: 1.04,
+        duration: 0.75,
+        ease: "power2.inOut",
+      },
+      0
+    );
+
+    // -------------------------------------------------------
+    // New video zooms outward
+    // -------------------------------------------------------
+
+    tl.to(
+      nextVideo,
+      {
+        scale: 1,
+        duration: 1,
+        ease: "power3.out",
+      },
+      0
+    );
+
+    // -------------------------------------------------------
+    // Circular reveal
+    // -------------------------------------------------------
+
+    tl.to(
+      transitionLayer,
+      {
+        clipPath: "circle(150% at 50% 50%)",
+        duration: 1.05,
+        ease: "power3.inOut",
+      },
+      0
+    );
+
+    // -------------------------------------------------------
+    // Mini video finishes slightly later
+    // -------------------------------------------------------
+
+    if (miniVideo) {
+      tl.to(
+        miniVideo,
+        {
+          scale: 0.92,
+          duration: 0.4,
+          ease: "power2.inOut",
+        },
+        0.45
+      );
+    }
+  };
+
+  // =========================================================
   // MINI VIDEO CLICK
   // =========================================================
 
   const handleMiniVdClick = () => {
-    setHasClicked(true);
-
-    setCurrentIndex(
-      (prevIndex) => (prevIndex % totalVideos) + 1
-    );
+    changeVideo(getNextIndex());
   };
 
   // =========================================================
-  // MINI VIDEO TRANSITION
-  // =========================================================
-
-  useEffect(() => {
-    if (!hasClicked) return;
-
-    const nextVideo = document.getElementById("next-video");
-    const currentVideo = document.getElementById("current-video");
-
-    if (nextVideo) {
-      gsap.set(nextVideo, {
-        visibility: "visible",
-      });
-
-      gsap.to(nextVideo, {
-        transformOrigin: "center center",
-        scale: 1,
-        width: "100%",
-        height: "100%",
-        duration: 1,
-        ease: "power1.inOut",
-      });
-    }
-
-    if (currentVideo) {
-      gsap.from(currentVideo, {
-        transformOrigin: "center center",
-        scale: 0,
-        duration: 1.5,
-        ease: "power1.inOut",
-      });
-    }
-  }, [currentIndex, hasClicked]);
-
-  // =========================================================
   // HERO ENTRANCE ANIMATION
-  // =========================================================
-  //
-  // IMPORTANT:
-  //
-  // This no longer runs immediately when Hero mounts.
-  //
-  // It waits for:
-  //
-  // LoadingScreen
-  //      ↓
-  // ShapeTransition
-  //      ↓
-  // introReady === true
-  //      ↓
-  // Hero typography animation
-  //
   // =========================================================
 
   useEffect(() => {
@@ -135,7 +269,7 @@ const Hero = ({ introReady = false }) => {
       }
 
       // -------------------------------------------------------
-      // HERO TITLE
+      // TITLE
       // -------------------------------------------------------
 
       if (titleWords) {
@@ -150,7 +284,7 @@ const Hero = ({ introReady = false }) => {
       }
 
       // -------------------------------------------------------
-      // HERO SUBTITLE
+      // SUBTITLE
       // -------------------------------------------------------
 
       if (subtitleRef.current) {
@@ -219,129 +353,128 @@ const Hero = ({ introReady = false }) => {
           bg-slate-900
         "
       >
-        <div>
 
-          {/* =================================================
-              MINI VIDEO PREVIEW
-          ================================================= */}
+        {/* ===================================================
+            CURRENT BACKGROUND VIDEO
+        =================================================== */}
 
-          <div
+        <div className="absolute inset-0 z-10">
+
+          <video
+            ref={currentVideoRef}
+            src={getVideoSrc(currentIndex)}
             className="
-              absolute
-              top-1/2
-              left-1/2
-              transform
-              -translate-x-1/2
-              -translate-y-1/2
-              z-50
-              size-64
-              cursor-pointer
-              overflow-hidden
-              rounded-lg
-              shadow-2xl
-            "
-          >
-            <div
-              onClick={handleMiniVdClick}
-              className="
-                origin-center
-                scale-50
-                opacity-0
-                transition-all
-                duration-500
-                ease-in
-                hover:scale-100
-                hover:opacity-100
-              "
-            >
-              <div className="relative size-64">
-
-                <video
-                  src={getVideoSrc(
-                    (currentIndex % totalVideos) + 1
-                  )}
-                  className="
-                    size-64
-                    origin-center
-                    scale-150
-                    object-cover
-                    object-center
-                  "
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  id="current-video"
-                />
-
-              </div>
-            </div>
-          </div>
-
-          {/* =================================================
-              NEXT VIDEO
-          ================================================= */}
-
-          <div
-            ref={nextVdRef}
-            className="
-              absolute
-              top-1/2
-              left-1/2
-              transform
-              -translate-x-1/2
-              -translate-y-1/2
-              invisible
-              z-20
-              size-64
+              w-full
+              h-full
               object-cover
               object-center
+              scale-110
             "
-            id="next-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+
+          <div className="absolute inset-0 bg-black/40" />
+
+        </div>
+
+        {/* ===================================================
+            NEXT VIDEO TRANSITION LAYER
+        =================================================== */}
+
+        <div
+          ref={transitionLayerRef}
+          className="
+            absolute
+            inset-0
+            z-30
+            overflow-hidden
+            pointer-events-none
+            invisible
+          "
+          style={{
+            clipPath: "circle(0% at 50% 50%)",
+          }}
+        >
+
+          <video
+            ref={nextVideoRef}
+            className="
+              absolute
+              inset-0
+              w-full
+              h-full
+              object-cover
+              object-center
+              scale-110
+            "
+            muted
+            loop
+            playsInline
+          />
+
+          <div className="absolute inset-0 bg-black/40" />
+
+        </div>
+
+        {/* ===================================================
+            MINI VIDEO
+        =================================================== */}
+
+        <div
+          ref={miniVideoRef}
+          className="
+            absolute
+            top-1/2
+            left-1/2
+            -translate-x-1/2
+            -translate-y-1/2
+            z-50
+            size-64
+            cursor-pointer
+            overflow-hidden
+            rounded-lg
+            shadow-2xl
+          "
+        >
+
+          <div
+            onClick={handleMiniVdClick}
+            className="
+              origin-center
+              scale-50
+              opacity-0
+              transition-all
+              duration-500
+              ease-in
+              hover:scale-100
+              hover:opacity-100
+            "
           >
-            <video
-              src={getVideoSrc(currentIndex)}
-              className="
-                w-full
-                h-full
-                object-cover
-                object-center
-              "
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-          </div>
 
-          {/* =================================================
-              BACKGROUND VIDEO
-          ================================================= */}
+            <div className="relative size-64">
 
-          <div className="absolute left-0 top-0 size-full">
+              <video
+                src={getVideoSrc(getNextIndex())}
+                className="
+                  size-64
+                  origin-center
+                  scale-150
+                  object-cover
+                  object-center
+                "
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
 
-            <video
-              src={getVideoSrc(
-                currentIndex === totalVideos - 1
-                  ? 1
-                  : currentIndex
-              )}
-              className="
-                w-full
-                h-full
-                object-cover
-                object-center
-                scale-110
-              "
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-
-            <div className="absolute inset-0 bg-black/40" />
+            </div>
 
           </div>
+
         </div>
 
         {/* ===================================================
@@ -353,50 +486,49 @@ const Hero = ({ introReady = false }) => {
             absolute
             bottom-6
             left-1/2
-            transform
             -translate-x-1/2
             z-50
             flex
             gap-2
           "
         >
-          {[...Array(totalVideos)].map((_, index) => {
 
-            const videoNames = [
-              "BSIS",
-              "BSBIO",
-              "BSCRIM",
-              "BPED",
-            ];
+          {[
+            "BSIS",
+            "BSBIO",
+            "BSCRIM",
+            "BPED",
+          ].map((videoName, index) => {
+
+            const videoIndex = index + 1;
 
             return (
               <div
-                key={index}
+                key={videoIndex}
                 className={`
                   group
                   relative
                   transition-all
                   duration-300
                   ${
-                    index + 1 === currentIndex
+                    videoIndex === currentIndex
                       ? "bg-emerald-400 w-8 shadow-[0_0_12px_rgba(52,211,153,0.8)]"
-                      : "bg-white/40 hover:bg-white/60"
+                      : "bg-white/40 hover:bg-white/60 w-2"
                   }
                   h-2
                   rounded-full
                   cursor-pointer
                 `}
                 onClick={() => {
-                  setCurrentIndex(index + 1);
-                  setHasClicked(true);
+                  changeVideo(videoIndex);
                 }}
               >
+
                 <span
                   className="
                     absolute
                     -top-8
                     left-1/2
-                    transform
                     -translate-x-1/2
                     text-white
                     text-xs
@@ -409,11 +541,13 @@ const Hero = ({ introReady = false }) => {
                     tracking-widest
                   "
                 >
-                  {videoNames[index]}
+                  {videoName}
                 </span>
+
               </div>
             );
           })}
+
         </div>
 
         {/* ===================================================
@@ -435,9 +569,7 @@ const Hero = ({ introReady = false }) => {
           "
         >
 
-          {/* =================================================
-              TOP LEFT
-          ================================================= */}
+          {/* TOP LEFT */}
 
           <div
             className="
@@ -469,6 +601,7 @@ const Hero = ({ introReady = false }) => {
                 drop-shadow-2xl
               "
             >
+
               <span className="block">
 
                 <span className="hero-word inline-block opacity-0">
@@ -484,6 +617,7 @@ const Hero = ({ introReady = false }) => {
                 </span>
 
               </span>
+
             </h1>
 
             <p
@@ -510,7 +644,9 @@ const Hero = ({ introReady = false }) => {
             </p>
 
           </div>
+
         </div>
+
       </div>
 
       {/* =====================================================
@@ -538,6 +674,7 @@ const Hero = ({ introReady = false }) => {
           select-none
         "
       >
+
         <span className="block">
 
           <span>FUT</span>
@@ -549,6 +686,7 @@ const Hero = ({ introReady = false }) => {
           <span>RE</span>
 
         </span>
+
       </h1>
 
       {/* =====================================================
@@ -569,6 +707,7 @@ const Hero = ({ introReady = false }) => {
           pointer-events-none
         "
       >
+
         <div
           className="
             flex
@@ -578,6 +717,7 @@ const Hero = ({ introReady = false }) => {
             pb-0
           "
         >
+
           <h1
             ref={zdspgcRef}
             style={{
@@ -601,6 +741,7 @@ const Hero = ({ introReady = false }) => {
               select-none
             "
           >
+
             <span className="block">
 
               <span className="hero-word inline-block opacity-0">
@@ -616,8 +757,11 @@ const Hero = ({ introReady = false }) => {
               </span>
 
             </span>
+
           </h1>
+
         </div>
+
       </div>
 
     </div>
