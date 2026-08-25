@@ -1,19 +1,23 @@
 // App.jsx
 import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/all";
 
-// Public website components
-import Welcome from "./components/Welcome";
-import About from "./components/About";
-import Hero from "./components/Hero";
-import NavBar from "./components/Navbar";
-import Features from "./components/Features";
-import Story from "./components/Story";
-import Contact from "./components/Contact";
-import Courses from "./components/Courses";
-import Events from "./components/Events";
-import Footer from "./components/Footer";
+// Layout
+import MainLayout from "./layouts/MainLayout";
+
+// Pages
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Courses from "./pages/Courses";
+import Events from "./pages/Events";
+import Contact from "./pages/Contact";
+import Admissions from "./pages/Admissions";
+import StudentLifePage from "./pages/StudentLifePage";
+import Enrollment from "./pages/Enrollment"; // Add this import
+
+// Components
 import LoadingScreen from "./components/LoadingScreen";
 
 // Admin components
@@ -27,25 +31,23 @@ import { supabase } from "./lib/supabase";
 gsap.registerPlugin(ScrollTrigger);
 
 function App() {
-  // =========================================================
-  // PUBLIC WEBSITE STATE
-  // =========================================================
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}
+
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState("home");
-
   const [loadingMessage, setLoadingMessage] = useState("");
-
-  // =========================================================
-  // ADMIN STATE
-  // =========================================================
 
   const [adminUser, setAdminUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
-
-  // Admin login modal from Navbar
   const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   // =========================================================
@@ -57,7 +59,6 @@ function App() {
 
     const checkSession = async () => {
       try {
-        // Get current Supabase session
         const {
           data: { session },
           error: sessionError,
@@ -65,28 +66,20 @@ function App() {
 
         if (sessionError) {
           console.error("Session error:", sessionError);
-
           if (mounted) {
             setAdminUser(null);
             setCheckingAuth(false);
           }
-
           return;
         }
 
-        // No logged-in user
         if (!session?.user) {
           if (mounted) {
             setAdminUser(null);
             setCheckingAuth(false);
           }
-
           return;
         }
-
-        // =====================================================
-        // CHECK IF USER IS AN ADMIN
-        // =====================================================
 
         const { data: admin, error: adminError } = await supabase
           .from("admin_users")
@@ -94,27 +87,15 @@ function App() {
           .eq("id", session.user.id)
           .single();
 
-        // User is not registered as admin
-        if (
-          adminError ||
-          !admin ||
-          admin.role !== "admin"
-        ) {
+        if (adminError || !admin || admin.role !== "admin") {
           console.warn("User is not an administrator.");
-
           await supabase.auth.signOut();
-
           if (mounted) {
             setAdminUser(null);
             setCheckingAuth(false);
           }
-
           return;
         }
-
-        // =====================================================
-        // ADMIN VERIFIED
-        // =====================================================
 
         if (mounted) {
           setAdminUser({
@@ -122,12 +103,10 @@ function App() {
             role: admin.role,
             adminEmail: admin.email,
           });
-
           setCheckingAuth(false);
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
-
         if (mounted) {
           setAdminUser(null);
           setCheckingAuth(false);
@@ -137,27 +116,15 @@ function App() {
 
     checkSession();
 
-    // =========================================================
-    // LISTEN FOR LOGIN / LOGOUT CHANGES
-    // =========================================================
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth event:", event);
 
-      // User logged out
       if (!session?.user) {
-        if (mounted) {
-          setAdminUser(null);
-        }
-
+        if (mounted) setAdminUser(null);
         return;
       }
-
-      // =======================================================
-      // VERIFY ADMIN AGAIN AFTER LOGIN
-      // =======================================================
 
       const { data: admin, error: adminError } = await supabase
         .from("admin_users")
@@ -165,19 +132,10 @@ function App() {
         .eq("id", session.user.id)
         .single();
 
-      if (
-        adminError ||
-        !admin ||
-        admin.role !== "admin"
-      ) {
+      if (adminError || !admin || admin.role !== "admin") {
         console.warn("Authenticated user is not an admin.");
-
         await supabase.auth.signOut();
-
-        if (mounted) {
-          setAdminUser(null);
-        }
-
+        if (mounted) setAdminUser(null);
         return;
       }
 
@@ -207,54 +165,42 @@ function App() {
   const handlePageLoadingComplete = () => {
     setPageLoading(false);
     window.scrollTo(0, 0);
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
   };
 
   // =========================================================
   // PAGE NAVIGATION
   // =========================================================
 
-  const navigateTo = (page, message) => {
+  const navigateTo = (path, message) => {
+    if (path === location.pathname) return;
+    
     setPageLoading(true);
     setLoadingMessage(message);
 
     setTimeout(() => {
-      setCurrentPage(page);
+      navigate(path);
       handlePageLoadingComplete();
     }, 3500);
   };
 
-  const navigateToContact = () => {
-    navigateTo("contact", "Loading Contact");
-  };
-
-  const navigateToHome = () => {
-    navigateTo("home", "Loading Home");
-  };
-
-  const navigateToAbout = () => {
-    navigateTo("about", "Loading About");
-  };
-
-  const navigateToCourses = () => {
-    navigateTo("courses", "Loading Courses");
-  };
-
-  const navigateToEvents = () => {
-    navigateTo("events", "Loading Events");
-  };
+  // Navigation functions
+  const navigateToContact = () => navigateTo("/contact", "Loading Contact");
+  const navigateToHome = () => navigateTo("/", "Loading Home");
+  const navigateToAbout = () => navigateTo("/about", "Loading About");
+  const navigateToCourses = () => navigateTo("/courses", "Loading Courses");
+  const navigateToEvents = () => navigateTo("/events", "Loading Events");
+  const navigateToAdmissions = () => navigateTo("/admissions", "Loading Admissions");
+  const navigateToStudentLife = () => navigateTo("/student-life", "Loading Student Life");
+  const navigateToEnrollment = () => navigateTo("/enrollment", "Loading Enrollment"); // Add this
 
   // =========================================================
   // ADMIN LOGIN SUCCESS
   // =========================================================
 
   const handleAdminLogin = async (user) => {
-    /*
-      AdminLogin should already verify the user against
-      the admin_users table.
-
-      We still verify here as an additional protection.
-    */
-
     try {
       const { data: admin, error } = await supabase
         .from("admin_users")
@@ -262,37 +208,25 @@ function App() {
         .eq("id", user.id)
         .single();
 
-      if (
-        error ||
-        !admin ||
-        admin.role !== "admin"
-      ) {
+      if (error || !admin || admin.role !== "admin") {
         console.error("Admin verification failed.");
-
         await supabase.auth.signOut();
-
         setAdminUser(null);
         setShowAdminLogin(false);
-
         return;
       }
 
-      // Save verified admin
       setAdminUser({
         ...user,
         role: admin.role,
         adminEmail: admin.email,
       });
 
-      // Close login modal
       setShowAdminLogin(false);
-
       console.log("Admin successfully authenticated.");
     } catch (error) {
       console.error("Admin login verification error:", error);
-
       await supabase.auth.signOut();
-
       setAdminUser(null);
       setShowAdminLogin(false);
     }
@@ -302,13 +236,8 @@ function App() {
   // ADMIN LOGIN MODAL
   // =========================================================
 
-  const openAdminLogin = () => {
-    setShowAdminLogin(true);
-  };
-
-  const closeAdminLogin = () => {
-    setShowAdminLogin(false);
-  };
+  const openAdminLogin = () => setShowAdminLogin(true);
+  const closeAdminLogin = () => setShowAdminLogin(false);
 
   // =========================================================
   // ADMIN LOGOUT
@@ -317,20 +246,13 @@ function App() {
   const handleAdminLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        console.error("Logout error:", error);
-      }
+      if (error) console.error("Logout error:", error);
 
       setAdminUser(null);
       setShowAdminLogin(false);
-
-      // Return to home
-      setCurrentPage("home");
-
+      navigate("/");
       window.scrollTo(0, 0);
 
-      // If currently on /admin, return to main website
       if (window.location.pathname === "/admin") {
         window.history.replaceState({}, "", "/");
       }
@@ -343,8 +265,7 @@ function App() {
   // DETECT ADMIN PAGE
   // =========================================================
 
-  const isAdminPage =
-    window.location.pathname === "/admin";
+  const isAdminPage = location.pathname === "/admin";
 
   // =========================================================
   // AUTH CHECK LOADING SCREEN
@@ -365,10 +286,6 @@ function App() {
   // =========================================================
 
   if (isAdminPage) {
-    // ---------------------------------------------------------
-    // VERIFIED ADMIN
-    // ---------------------------------------------------------
-
     if (adminUser) {
       return (
         <AdminDashboard
@@ -378,15 +295,10 @@ function App() {
       );
     }
 
-    // ---------------------------------------------------------
-    // NOT LOGGED IN
-    // ---------------------------------------------------------
-
     return (
       <AdminLogin
         onLogin={handleAdminLogin}
         onClose={() => {
-          // Return to previous page if possible
           if (window.history.length > 1) {
             window.history.back();
           } else {
@@ -399,12 +311,20 @@ function App() {
   }
 
   // =========================================================
+  // GET CURRENT PAGE FOR NAVBAR
+  // =========================================================
+
+  const getCurrentPage = () => {
+    const path = location.pathname.replace("/", "");
+    return path || "home";
+  };
+
+  // =========================================================
   // PUBLIC WEBSITE
   // =========================================================
 
   return (
-    <main className="relative min-h-screen w-screen overflow-x-hidden bg-white">
-
+    <main className="relative min-h-screen w-screen overflow-x-hidden">
       {/* =====================================================
           INITIAL WEBSITE LOADING
       ===================================================== */}
@@ -432,102 +352,39 @@ function App() {
       ===================================================== */}
 
       {!loading && !pageLoading && (
-        <>
-          {/* =================================================
-              NAVBAR
-          ================================================= */}
+        <MainLayout
+          onHomeClick={navigateToHome}
+          onCoursesClick={navigateToCourses}
+          onEventsClick={navigateToEvents}
+          onAboutClick={navigateToAbout}
+          onContactClick={navigateToContact}
+          onAdmissionsClick={navigateToAdmissions}
+          onStudentLifeClick={navigateToStudentLife}
+          onEnrollmentClick={navigateToEnrollment} // Add this
+          currentPage={getCurrentPage()}
+        >
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/admissions" element={<Admissions />} />
+            <Route path="/student-life" element={<StudentLifePage />} />
+            <Route path="/enrollment" element={<Enrollment />} /> {/* Add this route */}
+          </Routes>
+        </MainLayout>
+      )}
 
-          <NavBar
-            onContactClick={navigateToContact}
-            onHomeClick={navigateToHome}
-            onAboutClick={navigateToAbout}
-            onCoursesClick={navigateToCourses}
-            onEventsClick={navigateToEvents}
+      {/* =====================================================
+          ADMIN LOGIN MODAL
+      ===================================================== */}
 
-            onAdminLoginClick={openAdminLogin}
-
-            currentPage={currentPage}
-          />
-
-          {/* =================================================
-              HOME
-          ================================================= */}
-
-          {currentPage === "home" && (
-            <>
-              <Hero />
-
-              <div className="bg-white">
-                <Welcome />
-
-                <Features
-                  onExploreAll={navigateToCourses}
-                />
-
-                <Story
-                  onNavigate={navigateToAbout}
-                />
-              </div>
-
-              <Footer />
-            </>
-          )}
-
-          {/* =================================================
-              ABOUT
-          ================================================= */}
-
-          {currentPage === "about" && (
-            <>
-              <About />
-              <Footer />
-            </>
-          )}
-
-          {/* =================================================
-              COURSES
-          ================================================= */}
-
-          {currentPage === "courses" && (
-            <>
-              <Courses />
-              <Footer />
-            </>
-          )}
-
-          {/* =================================================
-              EVENTS
-          ================================================= */}
-
-          {currentPage === "events" && (
-            <>
-              <Events />
-              <Footer />
-            </>
-          )}
-
-          {/* =================================================
-              CONTACT
-          ================================================= */}
-
-          {currentPage === "contact" && (
-            <>
-              <Contact />
-              <Footer />
-            </>
-          )}
-
-          {/* =================================================
-              ADMIN LOGIN MODAL
-          ================================================= */}
-
-          {showAdminLogin && (
-            <AdminLogin
-              onLogin={handleAdminLogin}
-              onClose={closeAdminLogin}
-            />
-          )}
-        </>
+      {showAdminLogin && (
+        <AdminLogin
+          onLogin={handleAdminLogin}
+          onClose={closeAdminLogin}
+        />
       )}
     </main>
   );

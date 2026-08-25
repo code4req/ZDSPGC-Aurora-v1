@@ -15,7 +15,7 @@ const Hero = () => {
   const zdspgcRef = useRef(null);
 
   const schoolVideos = [
-    '/videos/bsa.mp4',
+    '/videos/bsis.mp4',
     '/videos/bsbio.mp4',
     '/videos/bscrim.mp4',
     '/videos/bped.mp4',
@@ -58,29 +58,6 @@ const Hero = () => {
       }
     }
   }, [currentIndex, hasClicked]);
-
-  // ScrollTrigger for Video Clip Shape
-  useEffect(() => {
-    const videoFrame = document.getElementById('video-frame');
-    if (videoFrame) {
-      gsap.set(videoFrame, {
-        clipPath: 'polygon(14% 0, 72% 0, 88% 90%, 0 95%)',
-        borderRadius: '0% 0% 40% 10%',
-      });
-
-      gsap.from(videoFrame, {
-        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-        borderRadius: '0% 0% 0% 0%',
-        ease: 'power1.inOut',
-        scrollTrigger: {
-          trigger: videoFrame,
-          start: 'center center',
-          end: 'bottom center',
-          scrub: true,
-        },
-      });
-    }
-  }, []);
 
   // Entrance Typography Animations
   useEffect(() => {
@@ -140,7 +117,7 @@ const Hero = () => {
 
   return (
     <div className="relative h-dvh w-screen overflow-x-hidden bg-transparent">
-      {/* Video Frame */}
+      {/* Video Frame - Full Screen */}
       <div
         id="video-frame"
         className="relative z-10 h-dvh w-screen overflow-hidden bg-slate-900"

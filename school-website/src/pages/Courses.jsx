@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/all";
+import { useNavigate } from "react-router-dom";
 import { 
   FaLaptop, 
   FaMicroscope, 
@@ -17,9 +18,10 @@ import {
   FaCheckCircle,
   FaChevronDown,
   FaChevronUp,
-  FaLocationArrow
+  FaLocationArrow,
+  FaClipboardList
 } from "react-icons/fa";
-import AnimatedTitle from "./AnimatedTitle";
+import AnimatedTitle from "../components/AnimatedTitle";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -60,6 +62,7 @@ const BentoCard = ({ children, className = "", onMouseEnter, onMouseLeave }) => 
 };
 
 const Courses = () => {
+  const navigate = useNavigate();
   const [activeCourse, setActiveCourse] = useState(null);
   const [expandedCourse, setExpandedCourse] = useState(null);
   
@@ -232,6 +235,19 @@ const Courses = () => {
     }
   ];
 
+  // Navigation handlers - FIXED HERE
+  const handleApplyNow = () => {
+    navigate("/admissions");
+  };
+
+  const handleEnrollmentSteps = () => {
+    navigate("/enrollment");  // Changed from "/admissions" to "/enrollment"
+  };
+
+  const handleDownloadCurriculum = () => {
+    window.open("/curriculum.pdf", "_blank");
+  };
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Hero Entrance
@@ -358,6 +374,7 @@ const Courses = () => {
         <p className="hero-element text-emerald-100/70 text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-general mb-10">
           Discover six comprehensive programs designed to prepare you for a successful career.
         </p>
+
       </div>
 
       {/* TILTED SQUARE FLOATING CLIP SECTION */}
@@ -576,12 +593,26 @@ const Courses = () => {
             Choose from our six programs and take the first step toward your future career.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-emerald-400 text-black text-xs font-bold uppercase tracking-wider hover:bg-emerald-300 transition-colors shadow-[0_0_25px_rgba(52,211,153,0.25)]">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <button 
+              onClick={handleEnrollmentSteps}
+              className="flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/30 hover:scale-105 transform transition-all duration-300"
+            >
+              <FaClipboardList />
+              <span>Enrollment Steps</span>
+              <FaArrowRight />
+            </button>
+            <button 
+              onClick={handleApplyNow}
+              className="flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-emerald-400 text-black text-xs font-bold uppercase tracking-wider hover:bg-emerald-300 shadow-[0_0_25px_rgba(52,211,153,0.25)] hover:scale-105 transform transition-all duration-300"
+            >
               <span>Apply Now</span>
               <FaArrowRight />
             </button>
-            <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-emerald-500/30 bg-emerald-950/60 text-emerald-200 text-xs font-bold uppercase tracking-wider hover:bg-emerald-900 transition-colors">
+            <button 
+              onClick={handleDownloadCurriculum}
+              className="flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-emerald-500/30 bg-emerald-950/60 text-emerald-200 text-xs font-bold uppercase tracking-wider hover:bg-emerald-900 hover:scale-105 transform transition-all duration-300"
+            >
               <span>Download Curriculum</span>
               <FaLocationArrow />
             </button>

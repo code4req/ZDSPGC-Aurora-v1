@@ -15,7 +15,7 @@ import {
   FaCheckCircle,
   FaLocationArrow
 } from "react-icons/fa";
-import AnimatedTitle from "./AnimatedTitle";
+import AnimatedTitle from "../components/AnimatedTitle";
 
 gsap.registerPlugin(ScrollTrigger);
 
