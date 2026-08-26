@@ -2,7 +2,8 @@
 import { TiLocationArrow } from "react-icons/ti";
 import { FaGraduationCap, FaRocket, FaAtom, FaDna, FaRunning, FaGavel, FaSeedling } from 'react-icons/fa';
 import AccordionGallery from './AccordionGallery';
-import { useNavigate } from 'react-router-dom'; // Add this import
+import { useNavigate } from 'react-router-dom';
+import AnimatedTitle from './AnimatedTitle'; // Import the AnimatedTitle component
 
 // Feature card for stats/info
 const FeatureCard = ({ icon: Icon, label, value, description, color = "emerald" }) => {
@@ -31,22 +32,16 @@ const FeatureCard = ({ icon: Icon, label, value, description, color = "emerald" 
 
 // Main Features component
 const Features = ({ onExploreAll }) => {
-  const navigate = useNavigate(); // Add useNavigate hook
+  const navigate = useNavigate();
 
   const handleExploreAll = () => {
-    // Navigate to courses page
     navigate('/courses');
-    
-    // Call the prop if it exists (for backward compatibility)
     if (onExploreAll) onExploreAll();
   };
 
   const handleExploreProgram = (item) => {
     console.log('Exploring program:', item);
-    // Navigate to courses page with optional state
     navigate('/courses', { state: { selectedProgram: item?.label || null } });
-    
-    // Call the prop if it exists (for backward compatibility)
     if (onExploreAll) onExploreAll(item);
   };
 
@@ -122,21 +117,20 @@ const Features = ({ onExploreAll }) => {
   return (
     <section className="relative min-h-screen py-24 px-4 md:px-8 bg-black">
       <div className="container mx-auto max-w-7xl relative z-10">
-        {/* Header */}
+        {/* Header with AnimatedTitle */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
+          <div className="hero-element inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs font-medium uppercase tracking-widest text-white/60">Innovation Hub</span>
           </div>
           
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-none mb-4">
-            Academic
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-              Excellence
-            </span>
-          </h2>
+          <AnimatedTitle 
+            title="Academic <b>E</b>xcellence"
+            containerClass="!text-white !text-4xl md:!text-6xl lg:!text-7xl font-black leading-none mb-4"
+            fontClass="font-zentry"
+          />
           
-          <p className="max-w-2xl mx-auto text-white/60 text-sm md:text-base">
+          <p className="max-w-2xl mx-auto text-white/60 text-sm md:text-base hero-element">
             Discover transformative programs designed to unlock your potential 
             and shape the future of your career.
           </p>
