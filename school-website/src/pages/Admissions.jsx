@@ -158,7 +158,7 @@ const Admissions = () => {
 
         <AnimatedTitle 
           title="Admissions&nbsp;<b>2026</b>"
-          containerClass="hero-element !text-white !text-7xl sm:!text-9xl md:!text-[12rem] lg:!text-[10rem] font-black uppercase tracking-tight leading-none mb-6"
+          containerClass="hero-element !text-white !text-7xl sm:!text-9xl md:!text-[12rem] lg:!text-[12rem] font-black uppercase tracking-tight leading-none mb-6"
           fontClass="font-zentry"
         />
 

@@ -199,12 +199,12 @@ const EnrollmentSteps = () => {
 
         <AnimatedTitle
           title="Enroll&nbsp;&nbsp;<b>O</b>nline"
-          containerClass="hero-element !text-white !text-7xl sm:!text-9xl md:!text-[12rem] lg:!text-[10rem] font-black uppercase tracking-tight leading-none mb-6"
+          containerClass="hero-element !text-white !text-7xl sm:!text-9xl md:!text-[12rem] lg:!text-[12rem] font-black uppercase tracking-tight leading-none mb-6"
           fontClass="font-zentry"
         />
 
         <p className="hero-element text-emerald-100/70 text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-general mb-10">
-          Start your journey at ZDSPGC Aurora Campus by following these simple steps
+          Start your journey at ZDSPGC Aurora Campus by following these simple steps:
         </p>
 
         {/* Back Button */}
@@ -229,15 +229,6 @@ const EnrollmentSteps = () => {
           </div>
         )}
         
-        {/* Completion Message */}
-        {isCompleted && (
-          <div className="hero-element animate-bounce">
-            <div className="inline-block bg-gradient-to-r from-emerald-900/50 to-green-900/50 border-2 border-emerald-500/50 text-emerald-300 px-8 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-500/20 backdrop-blur-sm">
-              🎉 Enrollment Complete! Welcome to ZDSPGC!
-            </div>
-          </div>
-        )}
-
         {/* Scroll Indicator */}
       </div>
 
