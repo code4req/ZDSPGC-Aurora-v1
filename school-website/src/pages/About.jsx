@@ -17,6 +17,7 @@ import {
   FaBullseye,
   FaLocationArrow
 } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; // ADD THIS IMPORT
 import AnimatedTitle from '../components/AnimatedTitle';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -69,9 +70,9 @@ const About = () => {
   // Data
   const stats = [
     { icon: <FaUsers />, value: "1000+", label: "Active Students" },
-    { icon: <FaBook />, value: "45+", label: "Academic Programs" },
+    { icon: <FaBook />, value: "6", label: "Academic Programs" },
     { icon: <FaTrophy />, value: "98%", label: "Graduation Rate" },
-    { icon: <FaBuilding />, value: "2009", label: "Year Founded" }
+    { icon: <FaBuilding />, value: "2018", label: "Year Founded" }
   ];
 
   const purposeData = [
@@ -129,7 +130,7 @@ const About = () => {
       label: "Classrooms", 
       mp4: "/videos/classroom.mp4", 
       webm: "/videos/classroom.webm",
-      poster: "/img/classroom.jpg"
+      poster: "/img/zdspgcv.jpg"
     },
     { 
       label: "Campus Events", 
@@ -258,7 +259,7 @@ const About = () => {
         />
 
         <p className="hero-element text-emerald-100/70 text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-general mb-10">
-          Zamboanga del Sur Provincial Government College Aurora Campus - Transforming lives through accessible, innovative, and impactful education since 2009.
+          Zamboanga del Sur Provincial Government College Aurora Campus - Transforming lives through accessible, innovative, and impactful education since 2018.
         </p>
       </div>
 
@@ -332,7 +333,7 @@ const About = () => {
               ZDSPGC Aurora Campus is committed to providing accessible, relevant, and quality education that prepares students for professional success and meaningful contribution to society.
             </p>
             <p className="text-sm font-mono text-emerald-400/80 border-l-2 border-emerald-400 pl-4 py-1">
-              Since 2009, we have served as a catalyst for growth, community transformation, and technological empowerment across Zamboanga del Sur.
+              Since 2018, we have served as a catalyst for growth, community transformation, and technological empowerment across Zamboanga del Sur.
             </p>
           </div>
         </div>
@@ -360,9 +361,14 @@ const About = () => {
                 <h3 className="text-3xl font-black uppercase text-white tracking-wide">Our Vision</h3>
               </div>
             </div>
-            <p className="text-emerald-100/70 text-base leading-relaxed">
-              To be a leading educational institution that produces globally competitive professionals who are innovative, socially responsible, and deeply committed to nation-building.
-            </p>
+            {/* VISION IMAGE */}
+            <div className="rounded-2xl overflow-hidden border border-emerald-500/20 flex-1">
+              <img 
+                src="/img/vision.jpg" 
+                alt="ZDSPGC Vision" 
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
           </BentoCard>
 
           <BentoCard className="p-10 flex flex-col justify-between">
@@ -375,9 +381,14 @@ const About = () => {
                 <h3 className="text-3xl font-black uppercase text-white tracking-wide">Our Mission</h3>
               </div>
             </div>
-            <p className="text-emerald-100/70 text-base leading-relaxed">
-              To provide quality and accessible higher education that develops the full potential of every student through innovative teaching, applied research, and proactive community engagement.
-            </p>
+            {/* MISSION IMAGE */}
+            <div className="rounded-2xl overflow-hidden border border-emerald-500/20 flex-1">
+              <img 
+                src="/img/mission.jpg" 
+                alt="ZDSPGC Mission" 
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
           </BentoCard>
         </div>
       </div>
@@ -520,14 +531,18 @@ const About = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-emerald-400 text-black text-xs font-bold uppercase tracking-wider hover:bg-emerald-300 transition-colors shadow-[0_0_25px_rgba(52,211,153,0.25)]">
-              <span>Explore Programs</span>
-              <FaArrowRight />
-            </button>
-            <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-emerald-500/30 bg-emerald-950/60 text-emerald-200 text-xs font-bold uppercase tracking-wider hover:bg-emerald-900 transition-colors">
-              <span>Contact Campus</span>
-              <FaArrowRight />
-            </button>
+            <Link to="/courses">
+              <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-emerald-400 text-black text-xs font-bold uppercase tracking-wider hover:bg-emerald-300 transition-colors shadow-[0_0_25px_rgba(52,211,153,0.25)]">
+                <span>Explore Programs</span>
+                <FaArrowRight />
+              </button>
+            </Link>
+            <Link to="/contact">
+              <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-emerald-500/30 bg-emerald-950/60 text-emerald-200 text-xs font-bold uppercase tracking-wider hover:bg-emerald-900 transition-colors">
+                <span>Contact Campus</span>
+                <FaArrowRight />
+              </button>
+            </Link>
           </div>
         </div>
       </div>

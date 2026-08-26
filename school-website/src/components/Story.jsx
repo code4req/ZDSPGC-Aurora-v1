@@ -1,12 +1,14 @@
 // Story.jsx
 import gsap from "gsap";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Add this import
 
 import Button from "./Button";
 import AnimatedTitle from "./AnimatedTitle";
 
 const Story = ({ onNavigate }) => {
   const frameRef = useRef(null);
+  const navigate = useNavigate(); // Add this
 
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
@@ -46,10 +48,13 @@ const Story = ({ onNavigate }) => {
     }
   };
 
-  // Handle button click - navigate to About
+  // Handle button click - navigate to Story page
   const handleStoryClick = () => {
+    navigate('/story'); // Navigate to the story page
+    
+    // Call the prop if it exists (for backward compatibility)
     if (onNavigate) {
-      onNavigate(); // This will trigger the navigation with loading screen
+      onNavigate();
     }
   };
 

@@ -30,6 +30,7 @@ import Contact from "./pages/Contact";
 import Admissions from "./pages/Admissions";
 import StudentLifePage from "./pages/StudentLifePage";
 import Enrollment from "./pages/Enrollment";
+import StoryPage from './components/StoryPage';
 
 // =========================================================
 // COMPONENTS
@@ -822,6 +823,8 @@ function AppContent() {
               path="/enrollment"
               element={<Enrollment />}
             />
+
+            <Route path="/story" element={<StoryPage />} />
 
           </Routes>
         </MainLayout>

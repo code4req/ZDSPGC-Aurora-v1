@@ -2,6 +2,7 @@
 import { TiLocationArrow } from "react-icons/ti";
 import { FaGraduationCap, FaRocket, FaAtom, FaDna, FaRunning, FaGavel, FaSeedling } from 'react-icons/fa';
 import AccordionGallery from './AccordionGallery';
+import { useNavigate } from 'react-router-dom'; // Add this import
 
 // Feature card for stats/info
 const FeatureCard = ({ icon: Icon, label, value, description, color = "emerald" }) => {
@@ -30,12 +31,22 @@ const FeatureCard = ({ icon: Icon, label, value, description, color = "emerald" 
 
 // Main Features component
 const Features = ({ onExploreAll }) => {
+  const navigate = useNavigate(); // Add useNavigate hook
+
   const handleExploreAll = () => {
+    // Navigate to courses page
+    navigate('/courses');
+    
+    // Call the prop if it exists (for backward compatibility)
     if (onExploreAll) onExploreAll();
   };
 
   const handleExploreProgram = (item) => {
     console.log('Exploring program:', item);
+    // Navigate to courses page with optional state
+    navigate('/courses', { state: { selectedProgram: item?.label || null } });
+    
+    // Call the prop if it exists (for backward compatibility)
     if (onExploreAll) onExploreAll(item);
   };
 

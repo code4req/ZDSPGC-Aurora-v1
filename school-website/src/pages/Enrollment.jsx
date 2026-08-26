@@ -192,17 +192,13 @@ const EnrollmentSteps = () => {
   return (
     <section className="relative w-full min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950 via-zinc-950 to-black text-white overflow-hidden selection:bg-emerald-400 selection:text-black">
       
-      {/* HERO SECTION */}
-      <div className="relative pt-32 px-6 overflow-hidden flex flex-col items-center text-center">
-        <div className="hero-element inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/60 px-5 py-2 backdrop-blur-md mb-8">
-          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-mono uppercase tracking-widest text-emerald-300">
-            ZDSPGC Enrollment Guide • Your Path to Success
-          </span>
-        </div>
+      {/* ===== HERO SECTION - FULL VIEWPORT HEIGHT ===== */}
+      <div className="relative h-screen w-full flex flex-col items-center justify-center px-6 pt-20 md:pt-24 lg:pt-28">
+        {/* Badge */}
+        
 
         <AnimatedTitle
-          title="How to <b>E</b>nroll"
+          title="Enroll&nbsp;&nbsp;<b>O</b>nline"
           containerClass="hero-element !text-white !text-7xl sm:!text-9xl md:!text-[12rem] lg:!text-[10rem] font-black uppercase tracking-tight leading-none mb-6"
           fontClass="font-zentry"
         />
@@ -212,13 +208,11 @@ const EnrollmentSteps = () => {
         </p>
 
         {/* Back Button */}
-        <div className="hero-element flex flex-wrap gap-4 justify-center mb-8">
-          
-        </div>
+
 
         {/* Step Progress Indicator */}
         {stepName && !isCompleted && (
-          <div className="hero-element mt-4 inline-flex items-center gap-3 bg-gray-900/80 px-6 py-3 rounded-full border border-gray-700 shadow-lg backdrop-blur-sm">
+          <div className="hero-element inline-flex items-center gap-3 bg-gray-900/80 px-6 py-3 rounded-full border border-gray-700 shadow-lg backdrop-blur-sm">
             <span className="text-sm text-gray-400">Current Step:</span>
             <span className="font-bold text-emerald-400">{stepName}</span>
             <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
@@ -237,15 +231,17 @@ const EnrollmentSteps = () => {
         
         {/* Completion Message */}
         {isCompleted && (
-          <div className="hero-element mt-6 animate-bounce">
+          <div className="hero-element animate-bounce">
             <div className="inline-block bg-gradient-to-r from-emerald-900/50 to-green-900/50 border-2 border-emerald-500/50 text-emerald-300 px-8 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-500/20 backdrop-blur-sm">
               🎉 Enrollment Complete! Welcome to ZDSPGC!
             </div>
           </div>
         )}
+
+        {/* Scroll Indicator */}
       </div>
 
-      {/* STEPPER SECTION */}
+      {/* ===== STEPPER SECTION ===== */}
       <div ref={sectionRef} className="relative py-12 px-6 max-w-7xl mx-auto border-t border-emerald-500/20">
         <div className="max-w-5xl mx-auto">
           <Stepper
@@ -331,7 +327,7 @@ const EnrollmentSteps = () => {
         </div>
       </div>
 
-      {/* QUICK STATS */}
+      {/* ===== QUICK STATS ===== */}
       <div className="py-12 px-6 max-w-7xl mx-auto border-t border-emerald-500/20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <BentoCard className="p-5 text-center">
@@ -365,7 +361,7 @@ const EnrollmentSteps = () => {
         </div>
       </div>
 
-      {/* FEATURE CARDS */}
+      {/* ===== FEATURE CARDS ===== */}
       <div className="py-12 px-6 max-w-7xl mx-auto border-t border-emerald-500/20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <BentoCard className="p-4 flex items-center gap-3">
@@ -392,7 +388,7 @@ const EnrollmentSteps = () => {
         </div>
       </div>
 
-      {/* FINAL CTA */}
+      {/* ===== FINAL CTA ===== */}
       <div className="cta-section relative py-32 px-6 border-t border-emerald-500/20 bg-black text-center overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-emerald-500/10 blur-[160px] pointer-events-none" />
 

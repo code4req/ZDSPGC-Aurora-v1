@@ -153,14 +153,8 @@ const Admissions = () => {
   return (
     <section className="relative w-full min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950 via-zinc-950 to-black text-white overflow-hidden selection:bg-emerald-400 selection:text-black">
       
-      {/* HERO SECTION */}
-      <div className="relative pt-32 px-6 overflow-hidden flex flex-col items-center text-center">
-        <div className="hero-element inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/60 px-5 py-2 backdrop-blur-md mb-8">
-          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-mono uppercase tracking-widest text-emerald-300">
-            ZDSPGC Admissions • Join Our Community
-          </span>
-        </div>
+      {/* ===== HERO SECTION - FULL VIEWPORT HEIGHT ===== */}
+      <div className="relative h-screen w-full flex flex-col items-center justify-center px-6 pt-20 md:pt-24 lg:pt-28">
 
         <AnimatedTitle 
           title="Admissions&nbsp;<b>2026</b>"
@@ -174,7 +168,7 @@ const Admissions = () => {
         </p>
 
         {/* Quick Info Cards */}
-        <div className="hero-element grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mb-10">
+        <div className="hero-element grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-4xl mb-10">
           <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 text-center backdrop-blur-sm hover:border-emerald-400/50 transition-all hover:scale-105">
             <div className="text-3xl font-bold text-emerald-400 mb-2">June 20</div>
             <p className="text-white/60 text-sm">Enrollment Starts</p>
@@ -190,19 +184,15 @@ const Admissions = () => {
         </div>
 
         {/* CTA Button */}
-        <div className="hero-element flex flex-wrap gap-4 justify-center mb-8">
-          <button 
-            onClick={handleApplyNow}
-            className="flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-sm font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/30 hover:scale-105 transform transition-all duration-300"
-          >
-            <FaGraduationCap className="text-lg" />
-            <span>Apply Now</span>
-            <FaArrowRight />
-          </button>
+        <div className="hero-element flex flex-wrap gap-4 justify-center">
+          
         </div>
+
+        {/* Scroll Indicator */}
+  
       </div>
 
-      {/* REQUIREMENTS & PROCESS SECTION */}
+      {/* ===== REQUIREMENTS & PROCESS SECTION ===== */}
       <div ref={detailsRef} className="relative py-24 px-6 max-w-7xl mx-auto border-t border-emerald-500/20">
         <div className="text-center mb-16">
           <p className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-2">Your Path to ZDSPGC</p>
@@ -276,7 +266,7 @@ const Admissions = () => {
         </div>
       </div>
 
-      {/* WHY CHOOSE ZDSPGC SECTION */}
+      {/* ===== WHY CHOOSE ZDSPGC SECTION ===== */}
       <div className="py-24 px-6 max-w-7xl mx-auto border-t border-emerald-500/20">
         <div className="text-center mb-16">
           <p className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-2">The ZDSPGC Advantage</p>
@@ -330,7 +320,7 @@ const Admissions = () => {
         </div>
       </div>
 
-      {/* FINAL CTA */}
+      {/* ===== FINAL CTA ===== */}
       <div ref={ctaRef} className="cta-section relative py-32 px-6 border-t border-emerald-500/20 bg-black text-center overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-emerald-500/10 blur-[160px] pointer-events-none" />
 
@@ -351,7 +341,7 @@ const Admissions = () => {
               className="flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/30 hover:scale-105 transform transition-all duration-300"
             >
               <FaGraduationCap />
-              <span>Apply Now</span>
+              <span>Apply Online Now</span>
               <FaArrowRight />
             </button>
             <Link
